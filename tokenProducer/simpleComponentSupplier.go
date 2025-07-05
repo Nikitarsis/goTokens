@@ -50,26 +50,26 @@ func jtiRoutine(jtiChan chan co.UUID) {
 	}
 }
 
-type SimpleComponentSupplier struct {
+type simpleComponentSupplier struct {
 	keyChan chan co.Key
 	jtiChan chan co.UUID
 }
 
-func NewSimpleComponentSupplier(keyChanSize, jtiChanSize uint) *SimpleComponentSupplier {
+func NewSimpleComponentSupplier(keyChanSize, jtiChanSize uint) *simpleComponentSupplier {
 	keyChan := make(chan co.Key, keyChanSize)
 	jtiChan := make(chan co.UUID, jtiChanSize)
 	go keyRoutine(keyChan)
 	go jtiRoutine(jtiChan)
-	return &SimpleComponentSupplier{
+	return &simpleComponentSupplier{
 		keyChan: keyChan,
 		jtiChan: jtiChan,
 	}
 }
 
-func (s *SimpleComponentSupplier) NewKey() co.Key {
+func (s *simpleComponentSupplier) NewKey() co.Key {
 	return <-s.keyChan
 }
 
-func (s *SimpleComponentSupplier) NewId() co.UUID {
+func (s *simpleComponentSupplier) NewId() co.UUID {
 	return <-s.jtiChan
 }

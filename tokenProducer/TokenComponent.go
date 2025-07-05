@@ -8,7 +8,7 @@ type TokenComponent struct {
 	producer          *tokenProducer
 	checker           *tokenParser
 	keyRepository     co.IKeyKeepingRepository
-	componentSupplier *SimpleComponentSupplier
+	componentSupplier *simpleComponentSupplier
 }
 
 func NewTokenComponentDefault(keyRepository co.IKeyKeepingRepository, config ITokenComponentConfig) *TokenComponent {
