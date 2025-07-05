@@ -2,6 +2,7 @@ package common
 
 import (
 	"encoding/base64"
+	"errors"
 )
 
 type UUID struct {
@@ -10,6 +11,15 @@ type UUID struct {
 
 func (u UUID) ToString() string {
 	return base64.RawStdEncoding.EncodeToString(u.value[:])
+}
+
+func GetUUIDFromBytes(b []byte) (UUID, error) {
+	var u UUID
+	if len(b) != 16 {
+		return UUID{}, errors.New("invalid byte length")
+	}
+	copy(u.value[:], b)
+	return u, nil
 }
 
 func GetUUIDFromString(s string) (UUID, error) {
