@@ -29,7 +29,7 @@ func (tp *tokenParser) parseToken(tokenString string) (*jwt.Token, error) {
 		if !ok {
 			return nil, jwt.ErrInvalidKey
 		}
-		return key, nil
+		return key.GetValue(), nil
 	})
 }
 
