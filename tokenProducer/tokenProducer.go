@@ -3,50 +3,47 @@ package tokenProducer
 import (
 	"time"
 
+	co "github.com/Nikitarsis/goTokens/common"
 	"github.com/dgrijalva/jwt-go"
 )
 
-type UUID [16]byte
-
 /*Создание токена*/
 type tokenProducer struct {
-	secretKey []byte // секретный ключ
-    issuer string // издатель токена
-    jtiSupplier func() UUID // функция для генерации уникального идентификатора токена
+	issuer            co.Issuer               // издатель токена
+	jtiSupplier       func() co.UUID       // функция для генерации уникального идентификатора токена
 }
 
-func NewTokenProducer(secretKey, issuer string, jtiSupplier func() UUID) *tokenProducer {
+func NewTokenProducer(issuer co.Issuer, jtiSupplier func() co.UUID) *tokenProducer {
 	return &tokenProducer{
-		secretKey:  []byte(secretKey),
-		issuer:     issuer,
-		jtiSupplier: jtiSupplier,
+		issuer:            issuer,
+		jtiSupplier:       jtiSupplier,
 	}
 }
 
 /*Создание тела токена*/
-func (tp *tokenProducer) createClaims(tokenType string, uid UUID, groupId UUID) jwt.MapClaims {
-    return jwt.MapClaims{
-        "type": tokenType,//тип токена: authorized или refresh
-        "group": groupId,// ID пары токенов
-        "jti": tp.jtiSupplier(),// уникальный идентификатор токена
-        "iat": time.Now().Unix(),// время создания токена
-        "sub": uid,// ID пользователя
-        "iss": tp.issuer,// издатель токена
-    }
+func (tp *tokenProducer) createClaims(tokenType co.TokenType, uid co.UUID, keyId co.UUID) jwt.MapClaims {
+	return jwt.MapClaims{
+		"type": tokenType.String(), //тип токена: authorized или refresh
+		"kid":  keyId.ToString(), // ID ключа шифрования
+		"jti":  tp.jtiSupplier(), // уникальный идентификатор токена
+		"iat":  time.Now().Unix(), // время создания токена
+		"sub":  uid.ToString(), // ID пользователя
+		"iss":  tp.issuer.String(), // издатель токена
+	}
 }
 
 /*Создание токена определённого типа*/
-func (tp *tokenProducer) CreateToken(uid UUID, groupId UUID, tokenType string) (UUID, string, error) {
-    jti := tp.jtiSupplier()
-    token := jwt.NewWithClaims(jwt.SigningMethodES512, tp.createClaims(tokenType, uid, groupId))
-    signedString, err := token.SignedString(tp.secretKey)
-    return jti, signedString, err
+func (tp *tokenProducer) createToken(key co.Key, uid co.UUID, tokenType co.TokenType) (co.UUID, string, error) {
+	jti := tp.jtiSupplier()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, tp.createClaims(tokenType, uid, key.GetKid()))
+	signedString, err := token.SignedString(key)
+	return jti, signedString, err
 }
 
-func (tp *tokenProducer) CreateAuthorizedToken(uid UUID, groupId UUID) (UUID, string, error) {
-    return tp.CreateToken(uid, groupId, "authorized")
+func (tp *tokenProducer) CreateAccessToken(key co.Key, uid co.UUID) (co.UUID, string, error) {
+	return tp.createToken(key, uid, co.AccessToken)
 }
 
-func (tp *tokenProducer) CreateRefreshToken(uid UUID, groupId UUID) (UUID, string, error) {
-    return tp.CreateToken(uid, groupId, "refresh")
+func (tp *tokenProducer) CreateRefreshToken(key co.Key, uid co.UUID) (co.UUID, string, error) {
+	return tp.createToken(key, uid, co.RefreshToken)
 }
