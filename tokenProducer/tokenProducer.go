@@ -9,14 +9,14 @@ import (
 
 /*Создание токена*/
 type tokenProducer struct {
-	issuer            co.Issuer               // издатель токена
-	jtiSupplier       func() co.UUID       // функция для генерации уникального идентификатора токена
+	issuer      co.Issuer      // издатель токена
+	jtiSupplier func() co.UUID // функция для генерации уникального идентификатора токена
 }
 
 func NewTokenProducer(issuer co.Issuer, jtiSupplier func() co.UUID) *tokenProducer {
 	return &tokenProducer{
-		issuer:            issuer,
-		jtiSupplier:       jtiSupplier,
+		issuer:      issuer,
+		jtiSupplier: jtiSupplier,
 	}
 }
 
@@ -24,10 +24,10 @@ func NewTokenProducer(issuer co.Issuer, jtiSupplier func() co.UUID) *tokenProduc
 func (tp *tokenProducer) createClaims(tokenType co.TokenType, uid co.UUID, keyId co.UUID) jwt.MapClaims {
 	return jwt.MapClaims{
 		"type": tokenType.String(), //тип токена: authorized или refresh
-		"kid":  keyId.ToString(), // ID ключа шифрования
-		"jti":  tp.jtiSupplier(), // уникальный идентификатор токена
-		"iat":  time.Now().Unix(), // время создания токена
-		"sub":  uid.ToString(), // ID пользователя
+		"kid":  keyId.ToString(),   // ID ключа шифрования
+		"jti":  tp.jtiSupplier(),   // уникальный идентификатор токена
+		"iat":  time.Now().Unix(),  // время создания токена
+		"sub":  uid.ToString(),     // ID пользователя
 		"iss":  tp.issuer.String(), // издатель токена
 	}
 }
@@ -36,7 +36,7 @@ func (tp *tokenProducer) createClaims(tokenType co.TokenType, uid co.UUID, keyId
 func (tp *tokenProducer) createToken(key co.Key, uid co.UUID, tokenType co.TokenType) (co.UUID, string, error) {
 	jti := tp.jtiSupplier()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, tp.createClaims(tokenType, uid, key.GetKid()))
-	signedString, err := token.SignedString(key)
+	signedString, err := token.SignedString(key.GetValue())
 	return jti, signedString, err
 }
 
