@@ -1,3 +1,4 @@
+//Модуль, который отвечает за создание, валидацию и обработку JWT токенов
 module github.com/Nikitarsis/goTokens/tokenProducer
 
 go 1.22.2

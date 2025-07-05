@@ -6,10 +6,12 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// Тестовый парсер токенов
 func getTestTokenParser(keyFunc func(co.UUID) (co.Key, bool)) *tokenParser {
 	return NewTokenParser(keyFunc)
 }
 
+// TestParseToken создаёт тестирует парсинг токена
 func TestParseToken(t *testing.T) {
 	componentSupplier := getTestComponentSupplier()
 	uid := componentSupplier.NewId()

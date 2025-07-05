@@ -8,18 +8,21 @@ import (
 	goid "github.com/google/uuid"
 )
 
+// Создание нового ключа
 func createKey() (co.Key, error) {
 	id, err := createId()
 	if err != nil {
 		return co.Key{}, err
 	}
 	key := make([]byte, 64)
-	rand.Read(key)
+	rand.Read(key) // Случайная генерация ключа
 	ret := co.CreateKeyFromBytes(id, key)
 	return ret, nil
 }
 
+// Создание нового идентификатора
 func createId() (co.UUID, error) {
+	// Использование Google UUID для генерации
 	bytesId, _ := goid.New().MarshalBinary()
 	id, err := co.GetUUIDFromBytes(bytesId)
 	if err != nil {
@@ -28,6 +31,7 @@ func createId() (co.UUID, error) {
 	return id, nil
 }
 
+// Цикл, производящий новые ключи
 func keyRoutine(keyChan chan co.Key) {
 	for {
 		key, err := createKey()
@@ -39,37 +43,42 @@ func keyRoutine(keyChan chan co.Key) {
 	}
 }
 
-func jtiRoutine(jtiChan chan co.UUID) {
+// Цикл, производящий новые идентификаторы
+func idRoutine(idChan chan co.UUID) {
 	for {
 		jti, err := createId()
 		if err != nil {
 			log.Println(err)
 			continue
 		}
-		jtiChan <- jti
+		idChan <- jti
 	}
 }
 
+// simpleComponentSupplier - простая реализация поставщика компонентов
 type simpleComponentSupplier struct {
 	keyChan chan co.Key
-	jtiChan chan co.UUID
+	idChan  chan co.UUID
 }
 
-func NewSimpleComponentSupplier(keyChanSize, jtiChanSize uint) *simpleComponentSupplier {
+// Функция создает новый экземпляр simpleComponentSupplier
+func newSimpleComponentSupplier(keyChanSize, idChanSize uint) *simpleComponentSupplier {
 	keyChan := make(chan co.Key, keyChanSize)
-	jtiChan := make(chan co.UUID, jtiChanSize)
+	idChan := make(chan co.UUID, idChanSize)
 	go keyRoutine(keyChan)
-	go jtiRoutine(jtiChan)
+	go idRoutine(idChan)
 	return &simpleComponentSupplier{
 		keyChan: keyChan,
-		jtiChan: jtiChan,
+		idChan:  idChan,
 	}
 }
 
+// NewKey создает новый ключ
 func (s *simpleComponentSupplier) NewKey() co.Key {
 	return <-s.keyChan
 }
 
+// NewId создает новый идентификатор
 func (s *simpleComponentSupplier) NewId() co.UUID {
-	return <-s.jtiChan
+	return <-s.idChan
 }

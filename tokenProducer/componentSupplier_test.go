@@ -4,16 +4,28 @@ import (
 	"testing"
 )
 
+// Тестовый поставщик контента
 func getTestComponentSupplier() *simpleComponentSupplier {
-	return NewSimpleComponentSupplier(5, 5)
+	return newSimpleComponentSupplier(5, 5)
 }
 
+// Тест на создание новых компонентов без ошибок
 func TestNew(t *testing.T) {
 	componentSupplier := getTestComponentSupplier()
 	componentSupplier.NewId()
 	componentSupplier.NewKey()
 }
 
+// Тест на корректную работу поставщика компонентов
+func TestWorking(t *testing.T) {
+	componentSupplier := getTestComponentSupplier()
+	for i := 0; i < 500; i++ {
+		componentSupplier.NewId()
+		componentSupplier.NewKey()
+	}
+}
+
+// Тест уникальности ключей
 func TestNewKeys(t *testing.T) {
 	componentSupplier := getTestComponentSupplier()
 	key1 := componentSupplier.NewKey()
@@ -23,6 +35,7 @@ func TestNewKeys(t *testing.T) {
 	}
 }
 
+// Тест уникальности идентификаторов
 func TestNewIds(t *testing.T) {
 	componentSupplier := getTestComponentSupplier()
 	id1 := componentSupplier.NewId()

@@ -6,10 +6,12 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// Тестовый производитель токенов
 func getTestTokenProducer(componentSupplier *simpleComponentSupplier) *tokenProducer {
 	return NewTokenProducer(co.NewIssuer("test-issuer"), componentSupplier.NewId)
 }
 
+// TestCreateClaims тестирует создание заявок
 func TestCreateClaims(t *testing.T) {
 	componentSupplier := getTestComponentSupplier()
 	producer := getTestTokenProducer(componentSupplier)
@@ -21,6 +23,7 @@ func TestCreateClaims(t *testing.T) {
 	}
 }
 
+// TestCreateToken тестирует создание токена
 func TestCreateToken(t *testing.T) {
 	componentSupplier := getTestComponentSupplier()
 	producer := getTestTokenProducer(componentSupplier)
