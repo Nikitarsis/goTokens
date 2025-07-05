@@ -2,7 +2,7 @@ package tokenProducer
 
 import (
 	"testing"
-	
+
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
@@ -26,7 +26,7 @@ func TestCreateToken(t *testing.T) {
 	producer := getTestTokenProducer(componentSupplier)
 	uid := componentSupplier.NewId()
 	key := componentSupplier.NewKey()
-	jti, token, err := producer.createToken(key, uid, co.AccessToken);
+	jti, token, err := producer.createToken(key, uid, co.AccessToken)
 	if err != nil {
 		t.Fatal(err)
 	}
