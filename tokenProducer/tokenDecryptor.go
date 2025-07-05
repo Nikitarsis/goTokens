@@ -5,17 +5,17 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-type tokenChecker struct {
+type tokenParser struct {
 	keyGetter func(co.UUID) (co.Key, bool)
 }
 
-func NewTokenChecker(secretKeyProducer func(co.UUID) (co.Key, bool)) *tokenChecker {
-	return &tokenChecker{
+func NewTokenParser(secretKeyProducer func(co.UUID) (co.Key, bool)) *tokenParser {
+	return &tokenParser{
 		keyGetter: secretKeyProducer,
 	}
 }
 
-func (tc *tokenChecker) parseToken(tokenString string) (*jwt.Token, error) {
+func (tp *tokenParser) parseToken(tokenString string) (*jwt.Token, error) {
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		kidRaw, ok := token.Claims.(jwt.MapClaims)["kid"].(string)
 		if !ok {
@@ -25,7 +25,7 @@ func (tc *tokenChecker) parseToken(tokenString string) (*jwt.Token, error) {
 		if err != nil {
 			return nil, jwt.ErrInvalidKey
 		}
-		key, ok := tc.keyGetter(kid)
+		key, ok := tp.keyGetter(kid)
 		if !ok {
 			return nil, jwt.ErrInvalidKey
 		}
@@ -33,8 +33,8 @@ func (tc *tokenChecker) parseToken(tokenString string) (*jwt.Token, error) {
 	})
 }
 
-func (tc *tokenChecker) GetTokenData(tokenString string) (co.TokenData, error) {
-	token, err := tc.parseToken(tokenString)
+func (tp *tokenParser) GetTokenData(tokenString string) (co.TokenData, error) {
+	token, err := tp.parseToken(tokenString)
 	if err != nil {
 		return co.TokenData{}, err
 	}

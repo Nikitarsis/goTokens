@@ -5,9 +5,9 @@ import (
 )
 
 type TokenComponent struct {
-	producer    *tokenProducer
-	checker     *tokenChecker
-	keyRepository co.IKeyKeepingRepository
+	producer          *tokenProducer
+	checker           *tokenParser
+	keyRepository     co.IKeyKeepingRepository
 	componentSupplier *SimpleComponentSupplier
 }
 
@@ -16,9 +16,9 @@ func NewTokenComponentDefault(keyRepository co.IKeyKeepingRepository, config ITo
 	idSupply := componentSupplier.NewId
 	idFactory := keyRepository.GetKey
 	return &TokenComponent{
-		producer: NewTokenProducer(co.NewIssuer(config.GetIssuer()), idSupply),
-		checker: NewTokenChecker(idFactory),
-		keyRepository: keyRepository,
+		producer:          NewTokenProducer(co.NewIssuer(config.GetIssuer()), idSupply),
+		checker:           NewTokenParser(idFactory),
+		keyRepository:     keyRepository,
 		componentSupplier: componentSupplier,
 	}
 }
