@@ -1,5 +1,6 @@
 package common
 
+// TokenType - тип токена
 type TokenType string
 
 const (
@@ -7,6 +8,7 @@ const (
 	RefreshToken TokenType = "refresh"
 )
 
+// GetTokenType возвращает тип токена по его строковому представлению
 func GetTokenType(s string) TokenType {
 	switch s {
 	case "access":
@@ -18,6 +20,7 @@ func GetTokenType(s string) TokenType {
 	}
 }
 
+// String возвращает строковое представление типа токена
 func (t TokenType) String() string {
 	return string(t)
 }
