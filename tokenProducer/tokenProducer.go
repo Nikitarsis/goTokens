@@ -22,7 +22,7 @@ func NewTokenProducer(issuer co.Issuer, jtiSupplier func() co.UUID) *tokenProduc
 }
 
 // Создание тела токена
-func (tp *tokenProducer) createClaims(tokenType co.TokenType, uid co.UUID, keyId co.UUID) jwt.MapClaims {
+func (tp tokenProducer) createClaims(tokenType co.TokenType, uid co.UUID, keyId co.UUID) jwt.MapClaims {
 	return jwt.MapClaims{
 		"type": tokenType.String(), //тип токена: authorized или refresh
 		"kid":  keyId.ToString(),   // ID ключа шифрования
@@ -34,7 +34,7 @@ func (tp *tokenProducer) createClaims(tokenType co.TokenType, uid co.UUID, keyId
 }
 
 // Создание токена определённого типа
-func (tp *tokenProducer) createToken(key co.Key, uid co.UUID, tokenType co.TokenType) (co.UUID, string, error) {
+func (tp tokenProducer) createToken(key co.Key, uid co.UUID, tokenType co.TokenType) (co.UUID, string, error) {
 	jti := tp.jtiSupplier()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, tp.createClaims(tokenType, uid, key.GetKid()))
 	signedString, err := token.SignedString(key.GetValue())
@@ -42,11 +42,11 @@ func (tp *tokenProducer) createToken(key co.Key, uid co.UUID, tokenType co.Token
 }
 
 // CreateAccessToken создает новый access токен
-func (tp *tokenProducer) CreateAccessToken(key co.Key, uid co.UUID) (co.UUID, string, error) {
+func (tp tokenProducer) CreateAccessToken(key co.Key, uid co.UUID) (co.UUID, string, error) {
 	return tp.createToken(key, uid, co.AccessToken)
 }
 
 // CreateRefreshToken создает новый refresh токен
-func (tp *tokenProducer) CreateRefreshToken(key co.Key, uid co.UUID) (co.UUID, string, error) {
+func (tp tokenProducer) CreateRefreshToken(key co.Key, uid co.UUID) (co.UUID, string, error) {
 	return tp.createToken(key, uid, co.RefreshToken)
 }

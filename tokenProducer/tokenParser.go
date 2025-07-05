@@ -18,7 +18,7 @@ func NewTokenParser(secretKeyProducer func(co.UUID) (co.Key, bool)) *tokenParser
 }
 
 // parseToken парсит токен и возвращает его
-func (tp *tokenParser) parseToken(tokenString string) (*jwt.Token, error) {
+func (tp tokenParser) parseToken(tokenString string) (*jwt.Token, error) {
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		kidRaw, ok := token.Claims.(jwt.MapClaims)["kid"].(string)
 		if !ok {
@@ -37,7 +37,7 @@ func (tp *tokenParser) parseToken(tokenString string) (*jwt.Token, error) {
 }
 
 // GetTokenData извлекает данные токена из строки токена
-func (tp *tokenParser) GetTokenData(tokenString string) (co.TokenData, error) {
+func (tp tokenParser) GetTokenData(tokenString string) (co.TokenData, error) {
 	token, err := tp.parseToken(tokenString)
 	if err != nil {
 		return co.TokenData{}, err
