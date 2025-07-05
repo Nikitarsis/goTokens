@@ -25,6 +25,10 @@ func (k Key) GetKid() UUID {
 	return k.kid
 }
 
+func (k Key) GetValue() []byte {
+	return k.value
+}
+
 func (k Key) ToString() string {
 	return base64.StdEncoding.EncodeToString(k.value)
 }
