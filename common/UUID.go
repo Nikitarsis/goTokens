@@ -10,7 +10,7 @@ func (u UUID) ToString() string {
 	return base64.RawStdEncoding.EncodeToString(u[:]);
 }
 
-func getUUIDFromString(s string) (UUID, error) {
+func GetUUIDFromString(s string) (UUID, error) {
 	var u UUID
 	data, err := base64.RawStdEncoding.DecodeString(s)
 	if err != nil {
