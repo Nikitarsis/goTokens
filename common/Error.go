@@ -18,6 +18,7 @@ var (
 	ErrInternalServerError = errors.New("internal server error")
 	ErrStealedToken = errors.New("stealed token")
 	ErrInvalidMethod = errors.New("invalid method")
+	ErrWrongToken = errors.New("wrong token")
 )
 
 func ParseError(err error) Response {
@@ -61,6 +62,11 @@ func ParseError(err error) Response {
 		return Response{
 			StatusCode: http.StatusMethodNotAllowed,
 			Message:    []byte("Invalid Method"),
+		}
+	case ErrWrongToken:
+		return Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    []byte("Wrong Token"),
 		}
 	default:
 		return Response{
