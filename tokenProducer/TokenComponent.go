@@ -43,7 +43,7 @@ func (tc *TokenComponent) CreateTokens(uid co.UUID) (co.TokensPair, error) {
 		tc.keyRepository.SaveKey(key)
 	}()
 	return co.TokensPair{
-		Access:  access,
-		Refresh: refresh,
+		Access:  access.Value,
+		Refresh: refresh.Value,
 	}, nil
 }

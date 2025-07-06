@@ -33,7 +33,7 @@ func TestCreateToken(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if token == "" {
+	if token.Value == "" {
 		t.Error("Expected non-empty token")
 	}
 	if jti.ToString() == "" {
