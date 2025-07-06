@@ -1,4 +1,4 @@
-package controller
+package common
 
 import (
 	"errors"
@@ -6,13 +6,16 @@ import (
 )
 
 var (
+	// ErrInvalidToken - Ошибка, возникающая при недействительном токене (!Valid)
+	ErrInvalidToken = errors.New("invalid token")
+	// ErrNoFindKey - Ошибка, возникающая при отсутствии ключа
+	ErrNoFindKey   = errors.New("key not found")
 	// ErrNoUserId - Ошибка, возникающая при отсутствии userId
 	ErrNoUserId = errors.New("no userId in request")
 	ErrInvalidUserId = errors.New("invalid userId")
 	ErrJsonParsingError = errors.New("error parsing JSON")
 	ErrCannotParseUserId = errors.New("cannot parse userId")
 	ErrInternalServerError = errors.New("internal server error")
-	ErrInvalidToken = errors.New("invalid token")
 	ErrStealedToken = errors.New("stealed token")
 	ErrInvalidMethod = errors.New("invalid method")
 )

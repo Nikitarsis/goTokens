@@ -23,17 +23,17 @@ func (tp tokenParser) parseToken(token co.Token) (*jwt.Token, error) {
 		kidRaw, ok := token.Claims.(jwt.MapClaims)["kid"].(string)
 		// Проверка наличия ключа в токене
 		if !ok {
-			return nil, ErrInvalidToken
+			return nil, co.ErrInvalidToken
 		}
 		//Попытка парсинга ключа из токена
 		kid, err := co.GetUUIDFromString(kidRaw)
 		if err != nil {
-			return nil, ErrInvalidToken
+			return nil, co.ErrInvalidToken
 		}
 		// Поиск ключа в репозитории
 		key, ok := tp.keyGetter(kid)
 		if !ok {
-			return nil, ErrInvalidToken
+			return nil, co.ErrInvalidToken
 		}
 		return key.GetValue(), nil
 	})
@@ -49,7 +49,7 @@ func (tp tokenParser) GetTokenData(tokenRaw co.Token) (co.TokenData, error) {
 	}
 	//Проверка токена, невалидный токен НЕ возвращается как co.TokenData
 	if !token.Valid {
-		return co.TokenData{}, ErrInvalidToken
+		return co.TokenData{}, co.ErrInvalidToken
 	}
 	// Извлечение данных из токена
 	userId, err := co.GetUUIDFromString(token.Claims.(jwt.MapClaims)["sub"].(string))

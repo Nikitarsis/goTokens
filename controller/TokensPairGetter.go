@@ -29,11 +29,11 @@ func NewTokensPairGetter(
 func (tg TokensPairGetter) parseRequestGet(request *http.Request) (co.UUID, error) {
 	userIdStr := request.URL.Query().Get("uid")
 	if userIdStr == "" {
-		return co.UUID{}, ErrNoUserId
+		return co.UUID{}, co.ErrNoUserId
 	}
 	userId, err := co.GetUUIDFromString(userIdStr)
 	if err != nil {
-		return co.UUID{}, ErrInvalidUserId
+		return co.UUID{}, co.ErrInvalidUserId
 	}
 	return userId, nil
 }
@@ -43,20 +43,20 @@ func (tg TokensPairGetter) parseRequestPost(request *http.Request) (co.UUID, err
 	var body []byte
 	body, err := io.ReadAll(request.Body)
 	if err != nil {
-		return co.UUID{}, ErrJsonParsingError
+		return co.UUID{}, co.ErrJsonParsingError
 	}
 	err = json.Unmarshal(body, &userId)
 	if err != nil {
-		return co.UUID{}, ErrInvalidUserId
+		return co.UUID{}, co.ErrInvalidUserId
 	}
 	ret, err := co.GetUUIDFromString(userId.ID)
 	if err != nil {
-		return co.UUID{}, ErrInvalidUserId
+		return co.UUID{}, co.ErrInvalidUserId
 	}
 	return ret, nil
 }
 
-func (tg TokensPairGetter) GetTokensPair(request *http.Request) Response {
+func (tg TokensPairGetter) GetTokensPair(request *http.Request) co.Response {
 	method := request.Method
 	var userId co.UUID
 	var err error
@@ -64,19 +64,19 @@ func (tg TokensPairGetter) GetTokensPair(request *http.Request) Response {
 	case http.MethodGet:
 		userId, err = tg.parseRequestGet(request)
 		if err != nil {
-			return ParseError(err)
+			return co.ParseError(err)
 		}
 	case http.MethodPost:
 		userId, err = tg.parseRequestPost(request)
 		if err != nil {
-			return ParseError(err)
+			return co.ParseError(err)
 		}
 	default:
-		return ParseError(ErrInvalidMethod)
+		return co.ParseError(co.ErrInvalidMethod)
 	}
 	result, err := tg.getPairTokens(userId)
 	if err != nil {
-		return ParseError(ErrInternalServerError)
+		return co.ParseError(co.ErrInternalServerError)
 	}
 	pair := TokensPair{
 		Access:  result["access"].Token.ToString(),
@@ -84,7 +84,7 @@ func (tg TokensPairGetter) GetTokensPair(request *http.Request) Response {
 	}
 	ret, err := json.Marshal(pair)
 	if err != nil {
-		return ParseError(ErrInternalServerError)
+		return co.ParseError(co.ErrInternalServerError)
 	}
 	go tg.userAgentRepository.SaveUserAgent(
 		result["refresh"].KeyId,
@@ -94,7 +94,7 @@ func (tg TokensPairGetter) GetTokensPair(request *http.Request) Response {
 		result["refresh"].KeyId,
 		request.RemoteAddr,
 	)
-	return Response{
+	return co.Response{
 		StatusCode: http.StatusOK,
 		Message:    ret,
 	}

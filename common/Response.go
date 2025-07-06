@@ -1,4 +1,4 @@
-package controller
+package common
 
 type Response struct {
 	StatusCode  int
