@@ -21,30 +21,37 @@ func NewTokenParser(secretKeyProducer func(co.UUID) (co.Key, bool)) *tokenParser
 func (tp tokenParser) parseToken(token co.Token) (*jwt.Token, error) {
 	return jwt.Parse(token.Value, func(token *jwt.Token) (interface{}, error) {
 		kidRaw, ok := token.Claims.(jwt.MapClaims)["kid"].(string)
+		// Проверка наличия ключа в токене
 		if !ok {
-			return nil, jwt.ErrInvalidKey
+			return nil, ErrInvalidToken
 		}
+		//Попытка парсинга ключа из токена
 		kid, err := co.GetUUIDFromString(kidRaw)
 		if err != nil {
-			return nil, jwt.ErrInvalidKey
+			return nil, ErrInvalidToken
 		}
+		// Поиск ключа в репозитории
 		key, ok := tp.keyGetter(kid)
 		if !ok {
-			return nil, jwt.ErrInvalidKey
+			return nil, ErrInvalidToken
 		}
 		return key.GetValue(), nil
 	})
 }
 
 // GetTokenData извлекает данные токена из строки токена
+// Если токен невалиден, возвращает ошибку без значения co.TokenData
 func (tp tokenParser) GetTokenData(tokenRaw co.Token) (co.TokenData, error) {
+	// Парсинг токена
 	token, err := tp.parseToken(tokenRaw)
 	if err != nil {
 		return co.TokenData{}, err
 	}
+	//Проверка токена, невалидный токен НЕ возвращается как co.TokenData
 	if !token.Valid {
 		return co.TokenData{}, ErrInvalidToken
 	}
+	// Извлечение данных из токена
 	userId, err := co.GetUUIDFromString(token.Claims.(jwt.MapClaims)["sub"].(string))
 	if err != nil {
 		return co.TokenData{}, err

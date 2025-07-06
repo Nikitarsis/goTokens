@@ -7,7 +7,7 @@ import (
 // TokenComponent - компонент для работы с данным модулем
 type TokenComponent struct {
 	producer          *tokenProducer
-	checker           *tokenParser
+	parser           *tokenParser
 	keyRepository     co.IKeyKeepingRepository
 	componentSupplier *simpleComponentSupplier
 }
@@ -19,7 +19,7 @@ func NewTokenComponentDefault(keyRepository co.IKeyKeepingRepository, config ITo
 	idFactory := keyRepository.GetKey
 	return &TokenComponent{
 		producer:          NewTokenProducer(co.NewIssuer(config.GetIssuer()), idSupply),
-		checker:           NewTokenParser(idFactory),
+		parser:           NewTokenParser(idFactory),
 		keyRepository:     keyRepository,
 		componentSupplier: componentSupplier,
 	}
@@ -46,4 +46,14 @@ func (tc *TokenComponent) CreateTokens(uid co.UUID) (map[string]co.TokenData, er
 		"access":  access,
 		"refresh": refresh,
 	}, nil
+}
+
+// ParseToken парсит токен и возвращает его данные
+// Если токен невалиден, возвращает ошибку без значения co.TokenData
+func (tc *TokenComponent) ParseToken(token co.Token) (co.TokenData, error) {
+	ret, err := tc.parser.GetTokenData(token)
+	if err != nil {
+		return co.TokenData{}, err
+	}
+	return ret, nil
 }
