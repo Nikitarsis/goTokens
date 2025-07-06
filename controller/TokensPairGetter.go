@@ -2,18 +2,27 @@ package controller
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
 type TokensPairGetter struct {
-	callback func(co.UUID) (co.TokensPair, error)
+	getPairTokens       func(co.UUID) (map[string]co.TokenData, error)
+	userAgentRepository co.IUserAgentRepository
+	ipRepository        co.IIpRepository
 }
 
-func NewTokensPairGetter(callback func(co.UUID) (co.TokensPair, error)) *TokensPairGetter {
+func NewTokensPairGetter(
+	getPairTokens func(co.UUID) (map[string]co.TokenData, error),
+	userAgentRepository co.IUserAgentRepository,
+	ipRepository co.IIpRepository,
+) *TokensPairGetter {
 	return &TokensPairGetter{
-		callback: callback,
+		getPairTokens:       getPairTokens,
+		userAgentRepository: userAgentRepository,
+		ipRepository:        ipRepository,
 	}
 }
 
@@ -32,7 +41,7 @@ func (tg TokensPairGetter) parseRequestGet(request *http.Request) (co.UUID, erro
 func (tg TokensPairGetter) parseRequestPost(request *http.Request) (co.UUID, error) {
 	var userId UserId
 	var body []byte
-	_, err := request.Body.Read(body)
+	body, err := io.ReadAll(request.Body)
 	if err != nil {
 		return co.UUID{}, ErrJsonParsingError
 	}
@@ -63,19 +72,28 @@ func (tg TokensPairGetter) GetTokensPair(request *http.Request) Response {
 			return ParseError(err)
 		}
 	default:
-		return Response{
-			StatusCode: http.StatusMethodNotAllowed,
-			Message:    []byte("Method not allowed"),
-		}
+		return ParseError(ErrInvalidMethod)
 	}
-	result, err:= tg.callback(userId)
+	result, err := tg.getPairTokens(userId)
 	if err != nil {
 		return ParseError(ErrInternalServerError)
 	}
-	ret, err := json.Marshal(result)
+	pair := TokensPair{
+		Access:  result["access"].Token.ToString(),
+		Refresh: result["refresh"].Token.ToString(),
+	}
+	ret, err := json.Marshal(pair)
 	if err != nil {
 		return ParseError(ErrInternalServerError)
 	}
+	go tg.userAgentRepository.SaveUserAgent(
+		result["refresh"].KeyId,
+		request.UserAgent(),
+	)
+	go tg.ipRepository.TraceIp(
+		result["refresh"].KeyId,
+		request.RemoteAddr,
+	)
 	return Response{
 		StatusCode: http.StatusOK,
 		Message:    ret,

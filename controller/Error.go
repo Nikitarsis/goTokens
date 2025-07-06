@@ -12,6 +12,9 @@ var (
 	ErrJsonParsingError = errors.New("error parsing JSON")
 	ErrCannotParseUserId = errors.New("cannot parse userId")
 	ErrInternalServerError = errors.New("internal server error")
+	ErrInvalidToken = errors.New("invalid token")
+	ErrStealedToken = errors.New("stealed token")
+	ErrInvalidMethod = errors.New("invalid method")
 )
 
 func ParseError(err error) Response {
@@ -40,6 +43,21 @@ func ParseError(err error) Response {
 		return Response{
 			StatusCode: http.StatusInternalServerError,
 			Message:    []byte("Internal Server Error"),
+		}
+	case ErrInvalidToken:
+		return Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    []byte("Invalid Token"),
+		}
+	case ErrStealedToken:
+		return Response{
+			StatusCode: http.StatusForbidden,
+			Message:    []byte("Token is outdated"),
+		}
+	case ErrInvalidMethod:
+		return Response{
+			StatusCode: http.StatusMethodNotAllowed,
+			Message:    []byte("Invalid Method"),
 		}
 	default:
 		return Response{
