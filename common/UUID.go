@@ -1,6 +1,7 @@
 package common
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"errors"
 )
@@ -13,6 +14,12 @@ type UUID struct {
 // ToString возвращает строковое представление UUID в формате base64
 func (u UUID) ToString() string {
 	return base64.RawStdEncoding.EncodeToString(u.value[:])
+}
+
+func GetTestUUID() UUID {
+	var bytes [16]byte
+	_, _ = rand.Read(bytes[:])
+	return UUID{value: bytes}
 }
 
 // GetUUIDFromBytes создает новый UUID из массива байтов
