@@ -55,9 +55,14 @@ func (tr TokensRefresher) RefreshTokens(request *http.Request) (co.Response) {
 		return co.ParseError(co.ErrInvalidUserId)
 	}
 	// Парсинг токена
+	// Токен должен возвращать ошибку при !Valid
 	parsedToken, err := tr.parseToken(token)
 	if err != nil {
 		return co.ParseError(co.ErrInvalidToken)
+	}
+	// Проверка типа токена. Должен быть RefreshToken
+	if parsedToken.Type != co.RefreshToken {
+		return co.ParseError(co.ErrWrongToken)
 	}
 	// Проверка соответствия UID
 	if (parsedToken.UserId != uid) {
