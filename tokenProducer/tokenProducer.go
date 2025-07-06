@@ -34,19 +34,23 @@ func (tp tokenProducer) createClaims(tokenType co.TokenType, uid co.UUID, keyId 
 }
 
 // Создание токена определённого типа
-func (tp tokenProducer) createToken(key co.Key, uid co.UUID, tokenType co.TokenType) (co.UUID, co.Token, error) {
-	jti := tp.jtiSupplier()
+func (tp tokenProducer) createToken(key co.Key, uid co.UUID, tokenType co.TokenType) (co.TokenData, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, tp.createClaims(tokenType, uid, key.GetKid()))
 	signedString, err := token.SignedString(key.GetValue())
-	return jti, co.Token{Value: signedString}, err
+	return co.TokenData{
+		KeyId:    key.GetKid(),
+		UserId:   uid,
+		Type:     tokenType,
+		Token:    co.Token{Value: signedString},
+	}, err
 }
 
 // CreateAccessToken создает новый access токен
-func (tp tokenProducer) CreateAccessToken(key co.Key, uid co.UUID) (co.UUID, co.Token, error) {
+func (tp tokenProducer) CreateAccessToken(key co.Key, uid co.UUID) (co.TokenData, error) {
 	return tp.createToken(key, uid, co.AccessToken)
 }
 
 // CreateRefreshToken создает новый refresh токен
-func (tp tokenProducer) CreateRefreshToken(key co.Key, uid co.UUID) (co.UUID, co.Token, error) {
+func (tp tokenProducer) CreateRefreshToken(key co.Key, uid co.UUID) (co.TokenData, error) {
 	return tp.createToken(key, uid, co.RefreshToken)
 }

@@ -29,14 +29,23 @@ func TestCreateToken(t *testing.T) {
 	producer := getTestTokenProducer(componentSupplier)
 	uid := componentSupplier.NewId()
 	key := componentSupplier.NewKey()
-	jti, token, err := producer.createToken(key, uid, co.AccessToken)
+	tokenData, err := producer.createToken(key, uid, co.AccessToken)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if token.Value == "" {
+	if tokenData.Token.Value == "" {
 		t.Error("Expected non-empty token")
 	}
-	if jti.ToString() == "" {
+	if tokenData.TokenId.ToString() == "" {
 		t.Error("Expected non-empty JTI")
+	}
+	if tokenData.KeyId.ToString() == "" {
+		t.Error("Expected non-empty Key ID")
+	}
+	if tokenData.UserId.ToString() == "" {
+		t.Error("Expected non-empty User ID")
+	}
+	if tokenData.Type != co.AccessToken {
+		t.Error("Expected AccessToken type")
 	}
 }

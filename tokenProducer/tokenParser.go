@@ -37,8 +37,8 @@ func (tp tokenParser) parseToken(token co.Token) (*jwt.Token, error) {
 }
 
 // GetTokenData извлекает данные токена из строки токена
-func (tp tokenParser) GetTokenData(tokenStr co.Token) (co.TokenData, error) {
-	token, err := tp.parseToken(tokenStr)
+func (tp tokenParser) GetTokenData(tokenRaw co.Token) (co.TokenData, error) {
+	token, err := tp.parseToken(tokenRaw)
 	if err != nil {
 		return co.TokenData{}, err
 	}
@@ -54,9 +54,15 @@ func (tp tokenParser) GetTokenData(tokenStr co.Token) (co.TokenData, error) {
 		return co.TokenData{}, err
 	}
 	tokenType := co.GetTokenType(token.Claims.(jwt.MapClaims)["type"].(string))
+	tokenId, err := co.GetUUIDFromString(token.Claims.(jwt.MapClaims)["jti"].(string))
+	if err != nil {
+		return co.TokenData{}, err
+	}
 	return co.TokenData{
-		UserId: userId,
-		KeyId:  keyId,
-		Type:   tokenType,
+		Token:   tokenRaw,
+		TokenId: tokenId,
+		UserId:  userId,
+		KeyId:   keyId,
+		Type:    tokenType,
 	}, nil
 }

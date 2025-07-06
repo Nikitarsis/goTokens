@@ -25,8 +25,8 @@ func TestParseToken(t *testing.T) {
 	}
 	producer := getTestTokenProducer(componentSupplier)
 	parser := getTestTokenParser(keyFunc)
-	_, token, _ := producer.createToken(key, uid, co.AccessToken)
-	tokenData, err := parser.GetTokenData(token)
+	token, _ := producer.createToken(key, uid, co.AccessToken)
+	tokenData, err := parser.GetTokenData(token.Token)
 	if err != nil {
 		t.Fatal(err)
 	}

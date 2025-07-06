@@ -26,24 +26,24 @@ func NewTokenComponentDefault(keyRepository co.IKeyKeepingRepository, config ITo
 }
 
 // CreateTokens создает пару токенов (access и refresh) для данного пользователя
-func (tc *TokenComponent) CreateTokens(uid co.UUID) (co.TokensPair, error) {
+func (tc *TokenComponent) CreateTokens(uid co.UUID) (map[string]co.TokenData, error) {
 	key := tc.componentSupplier.NewKey()
 	// Создание access токена
-	_, access, err := tc.producer.CreateAccessToken(key, uid)
+	access, err := tc.producer.CreateAccessToken(key, uid)
 	if err != nil {
-		return co.TokensPair{}, err
+		return nil, err
 	}
 	// Создание refresh токена
-	_, refresh, err := tc.producer.CreateRefreshToken(key, uid)
+	refresh, err := tc.producer.CreateRefreshToken(key, uid)
 	if err != nil {
-		return co.TokensPair{}, err
+		return nil, err
 	}
 	// Асинхронное сохранение ключа
 	go func() {
 		tc.keyRepository.SaveKey(key)
 	}()
-	return co.TokensPair{
-		Access:  access.Value,
-		Refresh: refresh.Value,
+	return map[string]co.TokenData{
+		"access":  access,
+		"refresh": refresh,
 	}, nil
 }
