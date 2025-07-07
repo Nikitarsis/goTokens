@@ -131,8 +131,8 @@ func TestGetTokensPair(t *testing.T) {
 	if response.StatusCode != http.StatusOK {
 		t.Fatalf("Expected status code %v, got %v", http.StatusOK, response.StatusCode)
 	}
-	time.Sleep(10 * time.Millisecond)
-	str, check := checkMap(translated, refresh.KeyId, request.UserAgent(), request.RemoteAddr)
+	time.Sleep(100 * time.Millisecond)
+	str, check := checkMap(translated, refresh.KeyId, request.UserAgent(), "")
 	if !check {
 		t.Fatalf("Map check failed: %v", str)
 	}

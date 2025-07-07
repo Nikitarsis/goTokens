@@ -82,18 +82,19 @@ func (tg TokensPairGetter) GetTokensPair(request *http.Request) co.Response {
 		Access:  result["access"].Token.ToString(),
 		Refresh: result["refresh"].Token.ToString(),
 	}
+	refresh := result["refresh"]
 	ret, err := json.Marshal(pair)
 	if err != nil {
 		return co.ParseError(co.ErrInternalServerError)
 	}
 	go tg.userAgentRepository.SaveUserAgent(
-		result["refresh"].KeyId,
+		refresh.KeyId,
 		request.UserAgent(),
 	)
-	go tg.ipRepository.TraceIp(
-		result["refresh"].KeyId,
-		request.RemoteAddr,
-	)
+	errIp := traceIp(refresh, request.RemoteAddr, tg.ipRepository)
+	if errIp != nil {
+		return co.ParseError(errIp)
+	}
 	return co.Response{
 		StatusCode: http.StatusOK,
 		Message:    ret,

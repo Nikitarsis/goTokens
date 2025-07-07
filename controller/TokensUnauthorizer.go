@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"net/http"
 
 	co "github.com/Nikitarsis/goTokens/common"
@@ -13,25 +12,10 @@ type TokensUnauthorizer struct {
 }
 
 func (tu TokensUnauthorizer) UnauthorizeTokens(request *http.Request) co.Response {
-	var rawToken UserToken
-	var body []byte
-	//Проверка метода, должен быть POST
-	if request.Method != http.MethodPost {
-		return co.ParseError(co.ErrInvalidMethod)
-	}
-	// Чтение тела запроса
-	_, err := request.Body.Read(body)
-	if err != nil {
-		return co.ParseError(co.ErrInternalServerError)
-	}
 	// Парсинг тела запроса
-	err = json.Unmarshal(body, &rawToken)
+	token, err := parseBody(request)
 	if err != nil {
-		return co.ParseError(co.ErrJsonParsingError)
-	}
-	// Создание токена
-	token := co.Token{
-		Value: rawToken.Token,
+		return co.ParseError(err)
 	}
 	// Парсинг токена
 	parsedToken, err := tu.parseToken(token)

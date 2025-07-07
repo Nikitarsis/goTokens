@@ -12,6 +12,7 @@ type TokensRefresher struct {
 	getPairTokens func(co.UUID) (map[string]co.TokenData, error)
 	parseToken    func(co.Token) (co.TokenData, error)
 	userAgent     co.IUserAgentRepository
+	ipTracer      co.IIpRepository
 	dropKey       func(co.UUID) bool
 }
 
@@ -20,42 +21,24 @@ func NewTokensRefresher(
 	getPairTokens func(co.UUID) (map[string]co.TokenData, error),
 	parseToken func(co.Token) (co.TokenData, error),
 	userAgent co.IUserAgentRepository,
+	ipTracer co.IIpRepository,
 	dropKey func(co.UUID) bool,
 	) *TokensRefresher {
 	return &TokensRefresher{
 		getPairTokens: getPairTokens,
 		parseToken:    parseToken,
 		userAgent:     userAgent,
+		ipTracer:      ipTracer,
 		dropKey:       dropKey,
 	}
 }
 
 // RefreshTokens - это метод для обновления токенов
 func (tr TokensRefresher) RefreshTokens(request *http.Request) (co.Response) {
-	var rawToken UserToken
-	var body []byte
-	//Проверка метода, должен быть POST
-	if request.Method != http.MethodPost {
-		return co.ParseError(co.ErrInvalidMethod)
-	}
-	// Чтение тела запроса
-	_, err := request.Body.Read(body)
-	if err != nil {
-		return co.ParseError(co.ErrInternalServerError)
-	}
 	// Парсинг тела запроса
-	err = json.Unmarshal(body, &rawToken)
+	token, uid, err := parseBodyWithId(request)
 	if err != nil {
-		return co.ParseError(co.ErrJsonParsingError)
-	}
-	// Создание токена
-	token := co.Token{
-		Value: rawToken.Token,
-	}
-	// Получение UID
-	uid, err := co.GetUUIDFromString(rawToken.UID)
-	if err != nil {
-		return co.ParseError(co.ErrInvalidUserId)
+		return co.ParseError(err)
 	}
 	// Парсинг токена
 	// Токен должен возвращать ошибку при !Valid
