@@ -19,6 +19,7 @@ var (
 	ErrStealedToken = errors.New("stealed token")
 	ErrInvalidMethod = errors.New("invalid method")
 	ErrWrongToken = errors.New("wrong token")
+	ErrInvalidUserAgent = errors.New("invalid user agent")
 )
 
 func ParseError(err error) Response {
@@ -67,6 +68,11 @@ func ParseError(err error) Response {
 		return Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    []byte("Wrong Token"),
+		}
+	case ErrInvalidUserAgent:
+		return Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    []byte("Invalid User Agent"),
 		}
 	default:
 		return Response{

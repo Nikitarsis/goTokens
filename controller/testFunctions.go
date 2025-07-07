@@ -16,7 +16,7 @@ func (r *testUserAgentRepository) SaveUserAgent(kid co.UUID, userAgent string) e
 	return nil
 }
 
-func (r *testUserAgentRepository) CheckUserAgent(kid co.UUID) bool {
+func (r *testUserAgentRepository) CheckUserAgent(kid co.UUID, userAgent string) bool {
 	r.ret.Store("kid-UA-check", kid.ToString())
 	return true
 }

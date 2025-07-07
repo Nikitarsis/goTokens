@@ -9,20 +9,23 @@ import (
 
 // TokenRefresher - это класс для обновления токенов
 type TokensRefresher struct {
-	getPairTokens func(co.UUID) (TokensPair, error)
+	getPairTokens func(co.UUID) (map[string]co.TokenData, error)
 	parseToken    func(co.Token) (co.TokenData, error)
+	userAgent     co.IUserAgentRepository
 	dropKey       func(co.UUID) bool
 }
 
 // NewTokensRefresher - это конструктор для TokensRefresher
 func NewTokensRefresher(
-	getPairTokens func(co.UUID) (TokensPair, error),
+	getPairTokens func(co.UUID) (map[string]co.TokenData, error),
 	parseToken func(co.Token) (co.TokenData, error),
+	userAgent co.IUserAgentRepository,
 	dropKey func(co.UUID) bool,
 	) *TokensRefresher {
 	return &TokensRefresher{
 		getPairTokens: getPairTokens,
 		parseToken:    parseToken,
+		userAgent:     userAgent,
 		dropKey:       dropKey,
 	}
 }
@@ -70,10 +73,19 @@ func (tr TokensRefresher) RefreshTokens(request *http.Request) (co.Response) {
 		go tr.dropKey(parsedToken.KeyId)
 		return co.ParseError(co.ErrStealedToken)
 	}
+	// Если User-Agent не соответствует указанному при получении токена, ключи удаляются
+	if !tr.userAgent.CheckUserAgent(uid, request.UserAgent()) {
+		go tr.dropKey(parsedToken.KeyId)
+		return co.ParseError(co.ErrInvalidUserAgent)
+	}
 	// Получение пары токенов
-	pair, err := tr.getPairTokens(uid)
+	pairRaw, err := tr.getPairTokens(uid)
 	if err != nil {
 		return co.ParseError(co.ErrInternalServerError)
+	}
+	pair := TokensPair{
+		Access:  pairRaw["access"].Token.ToString(),
+		Refresh: pairRaw["refresh"].Token.ToString(),
 	}
 	// Превращение пары токенов в JSON
 	ret, err := json.Marshal(pair)
