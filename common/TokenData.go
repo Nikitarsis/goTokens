@@ -8,3 +8,13 @@ type TokenData struct {
 	KeyId   UUID
 	Type    TokenType
 }
+
+func GetTestTokenData(tokenType TokenType) TokenData {
+	return TokenData{
+		Token:   GetTestToken(),
+		TokenId: GetTestUUID(),
+		UserId:  GetTestUUID(),
+		KeyId:   GetTestUUID(),
+		Type:    tokenType,
+	}
+}

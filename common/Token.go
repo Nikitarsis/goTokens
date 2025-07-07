@@ -7,3 +7,9 @@ type Token struct {
 func (t Token) ToString() string {
 	return t.Value
 }
+
+func GetTestToken() Token {
+	return Token{
+		Value: "just.test.token",
+	}
+}
