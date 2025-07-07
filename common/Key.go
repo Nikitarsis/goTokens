@@ -2,12 +2,20 @@ package common
 
 import (
 	"encoding/base64"
+	"crypto/rand"
 )
 
 // Key - структура, представляющая ключ
 type Key struct {
 	kid   UUID
 	value []byte
+}
+
+// CreateTestKey создает тестовый ключ
+func CreateTestKey() Key {
+	key := make([]byte, 64)
+	rand.Read(key) // Случайная генерация ключа
+	return Key{kid: GetTestUUID(), value: key}
 }
 
 // CreateKeyFromBytes создает новый ключ из массива байтов
