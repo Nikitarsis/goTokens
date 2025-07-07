@@ -11,6 +11,16 @@ type TokensUnauthorizer struct {
 	dropKey   func(co.UUID) bool
 }
 
+func NewTokensUnauthorizer(
+	parseToken func(co.Token) (co.TokenData, error),
+	dropKey func(co.UUID) bool,
+) *TokensUnauthorizer {
+	return &TokensUnauthorizer{
+		parseToken: parseToken,
+		dropKey:    dropKey,
+	}
+}
+
 func (tu TokensUnauthorizer) UnauthorizeTokens(request *http.Request) co.Response {
 	// Парсинг тела запроса
 	token, err := parseBody(request)

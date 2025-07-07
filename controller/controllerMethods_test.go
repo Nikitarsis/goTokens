@@ -16,20 +16,20 @@ func TestTraceIP(t *testing.T) {
 	ipRaw := "192.168.1.1"
 	portRaw := "8080"
 	traceIp(testTokenData, ipRaw + ":" + portRaw, testRepo)
-	kid, _ := retMap.Load("kid-IP-trace")
+	kid, _ := retMap.Load("kid(TraceIp)")
 	if kid == testTokenData.KeyId.ToString() {
 		t.Error("KeyId tracing failed")
 	}
 	time.Sleep(10*time.Millisecond)
-	ip, _ := retMap.Load("ip")
+	ip, _ := retMap.Load("ip(TraceIp)")
 	if ip != ipRaw {
 		t.Error("IP tracing failed, expected:", ipRaw, "got:", ip)
 	}
-	port, _ := retMap.Load("port")
+	port, _ := retMap.Load("port(TraceIp)")
 	if port != portRaw {
 		t.Error("Port tracing failed, expected:", portRaw, "got:", port)
 	}
-	uid, _ := retMap.Load("uid")
+	uid, _ := retMap.Load("uid(TraceIp)")
 	if uid != testTokenData.UserId.ToString() {
 		t.Error("UserId tracing failed, expected:", testTokenData.UserId.ToString(), "got:", uid)
 	}

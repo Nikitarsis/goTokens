@@ -46,6 +46,11 @@ func (tr TokensRefresher) RefreshTokens(request *http.Request) (co.Response) {
 	if err != nil {
 		return co.ParseError(co.ErrInvalidToken)
 	}
+	// Трассировка IP
+	errTrace := traceIp(parsedToken, request.RemoteAddr, tr.ipTracer)
+	if errTrace != nil {
+		return co.ParseError(co.ErrInternalServerError)
+	}
 	// Проверка типа токена. Должен быть RefreshToken
 	if parsedToken.Type != co.RefreshToken {
 		return co.ParseError(co.ErrWrongToken)
@@ -57,7 +62,7 @@ func (tr TokensRefresher) RefreshTokens(request *http.Request) (co.Response) {
 		return co.ParseError(co.ErrStealedToken)
 	}
 	// Если User-Agent не соответствует указанному при получении токена, ключи удаляются
-	if !tr.userAgent.CheckUserAgent(uid, request.UserAgent()) {
+	if !tr.userAgent.CheckUserAgent(parsedToken.KeyId, request.UserAgent()) {
 		go tr.dropKey(parsedToken.KeyId)
 		return co.ParseError(co.ErrInvalidUserAgent)
 	}

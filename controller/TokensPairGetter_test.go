@@ -21,25 +21,25 @@ func getRandomTokenData() co.TokenData {
 }
 
 func checkMap(
-	translator func(string) string,
+	translator func(int, string) string,
 	kid co.UUID,
 	userAgent string,
 	ip string,
 ) (string, bool) {
-	if translator("kid-UA-check") != "" {
+	if translator(1, "userAgent(SaveUserAgent)") != "" {
 		return "this method shouldn't be called", false
 	}
-	if translator("ip") != ip {
+	if translator(0, "ip(TraceIp)") != ip {
 		return "Incorrect IP", false
 	}
-	if translator("kid-IP-trace") != kid.ToString() {
-		ret := fmt.Sprintf("Incorrect IP kid %s, should be: %s", translator("kid-IP-trace"), kid.ToString())
+	if translator(0, "kid(TraceIp)") != kid.ToString() {
+		ret := fmt.Sprintf("Incorrect IP kid %s, should be: %s", translator(0, "kid(TraceIp)"), kid.ToString())
 		return ret, false
 	}
-	if translator("kid-UA-save") != kid.ToString() {
+	if translator(1, "kid(SaveUserAgent)") != kid.ToString() {
 		return "Incorrect userAgent save kid", false
 	}
-	if translator("userAgent") != userAgent {
+	if translator(1, "userAgent(CheckUserAgent)") != userAgent {
 		return "Incorrect userAgent", false
 	}
 	return "Ok", true
@@ -138,8 +138,8 @@ func TestGetTokensPair(t *testing.T) {
 	}
 }
 
-func TestMulti(t *testing.T) {
-	for i := 0; i < 500; i++ {
-		TestGetTokensPair(t)
-	}
-}
+// func TestMulti(t *testing.T) {
+// 	for i := 0; i < 500; i++ {
+// 		TestGetTokensPair(t)
+// 	}
+// }

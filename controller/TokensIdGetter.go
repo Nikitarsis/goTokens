@@ -11,6 +11,12 @@ type TokensIdGetter struct {
 	parseToken func(co.Token) (co.TokenData, error)
 }
 
+func NewTokensIdGetter(parseToken func(co.Token) (co.TokenData, error)) *TokensIdGetter {
+	return &TokensIdGetter{
+		parseToken: parseToken,
+	}
+}
+
 func (tid *TokensIdGetter) GetTokenId(request *http.Request) co.Response {
 	token, err := parseBody(request)
 	if err != nil {
