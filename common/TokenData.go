@@ -9,6 +9,7 @@ type TokenData struct {
 	Type    TokenType
 }
 
+// GetTestTokenData - возвращает тестовые данные токена
 func GetTestTokenData(tokenType TokenType) TokenData {
 	return TokenData{
 		Token:   GetTestToken(),

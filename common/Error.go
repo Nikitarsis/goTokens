@@ -9,25 +9,34 @@ var (
 	// ErrInvalidToken - Ошибка, возникающая при недействительном токене (!Valid)
 	ErrInvalidToken = errors.New("invalid token")
 	// ErrNoFindKey - Ошибка, возникающая при отсутствии ключа
-	ErrNoFindKey   = errors.New("key not found")
+	ErrNoFindKey = errors.New("key not found")
 	// ErrNoUserId - Ошибка, возникающая при отсутствии userId
-	ErrNoUserId = errors.New("no userId in request")
-	ErrInvalidUserId = errors.New("invalid userId")
-	ErrJsonParsingError = errors.New("error parsing JSON")
-	ErrCannotParseUserId = errors.New("cannot parse userId")
+	ErrNoUserId            = errors.New("no userId in request")
+	// ErrInvalidUserId - Ошибка, возникающая при недействительном userId
+	ErrInvalidUserId       = errors.New("invalid userId")
+	// ErrJsonParsingError - Ошибка, возникающая при ошибке парсинга JSON
+	ErrJsonParsingError    = errors.New("error parsing JSON")
+	// ErrCannotParseUserId - Ошибка, возникающая при невозможности парсинга userId
+	ErrCannotParseUserId   = errors.New("cannot parse userId")
+	// ErrInternalServerError - Ошибка, возникающая при внутренней ошибке сервера
 	ErrInternalServerError = errors.New("internal server error")
-	ErrStealedToken = errors.New("stealed token")
-	ErrInvalidMethod = errors.New("invalid method")
-	ErrWrongToken = errors.New("wrong token")
-	ErrInvalidUserAgent = errors.New("invalid user agent")
+	// ErrStealedToken - Ошибка, возникающая при использовании украденного токена
+	ErrStealedToken        = errors.New("stealed token")
+	// ErrInvalidMethod - Ошибка, возникающая при недопустимом методе
+	ErrInvalidMethod       = errors.New("invalid method")
+	// ErrWrongToken - Ошибка, возникающая при неверном токене
+	ErrWrongToken          = errors.New("wrong token")
+	// ErrInvalidUserAgent - Ошибка, возникающая при недопустимом User-Agent
+	ErrInvalidUserAgent    = errors.New("invalid user agent")
 )
 
+// ParseError - функция для обработки ошибок
 func ParseError(err error) Response {
 	switch err {
 	case ErrNoUserId:
 		return Response{
 			StatusCode: http.StatusBadRequest,
-			Message:    []byte("User ID is required"),
+			Message:    []byte("User ID is wrong or missing"),
 		}
 	case ErrInvalidUserId:
 		return Response{
