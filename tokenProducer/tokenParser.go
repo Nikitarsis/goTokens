@@ -51,17 +51,34 @@ func (tp tokenParser) GetTokenData(tokenRaw co.Token) (co.TokenData, error) {
 	if !token.Valid {
 		return co.TokenData{}, co.ErrInvalidToken
 	}
+	claims := token.Claims.(jwt.MapClaims)
 	// Извлечение данных из токена
-	userId, err := co.GetUUIDFromString(token.Claims.(jwt.MapClaims)["sub"].(string))
+	sub, ok := claims["sub"].(string)
+	if !ok {
+		return co.TokenData{}, co.ErrInvalidToken
+	}
+	userId, err := co.GetUUIDFromString(sub)
 	if err != nil {
 		return co.TokenData{}, err
 	}
-	keyId, err := co.GetUUIDFromString(token.Claims.(jwt.MapClaims)["kid"].(string))
+	kid, ok := claims["kid"].(string)
+	if !ok {
+		return co.TokenData{}, co.ErrInvalidToken
+	}
+	keyId, err := co.GetUUIDFromString(kid)
 	if err != nil {
 		return co.TokenData{}, err
 	}
-	tokenType := co.GetTokenType(token.Claims.(jwt.MapClaims)["type"].(string))
-	tokenId, err := co.GetUUIDFromString(token.Claims.(jwt.MapClaims)["jti"].(string))
+	tokType, ok := claims["type"].(string)
+	if !ok {
+		return co.TokenData{}, co.ErrInvalidToken
+	}
+	tokenType := co.GetTokenType(tokType)
+	jti, ok := claims["jti"].(string)
+	if !ok {
+		return co.TokenData{}, co.ErrInvalidToken
+	}
+	tokenId, err := co.GetUUIDFromString(jti)
 	if err != nil {
 		return co.TokenData{}, err
 	}
