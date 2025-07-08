@@ -6,11 +6,13 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// TokensUnauthorizer - структура для аннулирования токенов
 type TokensUnauthorizer struct {
 	parseToken func(co.Token) (co.TokenData, error)
 	dropKey   func(co.UUID) bool
 }
 
+// NewTokensUnauthorizer - создает новый экземпляр TokensUnauthorizer
 func NewTokensUnauthorizer(
 	parseToken func(co.Token) (co.TokenData, error),
 	dropKey func(co.UUID) bool,
@@ -21,11 +23,16 @@ func NewTokensUnauthorizer(
 	}
 }
 
+// UnauthorizeTokens - аннулирует токены
 func (tu TokensUnauthorizer) UnauthorizeTokens(request *http.Request) co.Response {
 	// Парсинг тела запроса
 	token, err := parseBody(request)
 	if err != nil {
 		return co.ParseError(err)
+	}
+	//Проверка метода, должен быть POST
+	if request.Method != http.MethodPost {
+		return co.ParseError(co.ErrInvalidMethod)
 	}
 	// Парсинг токена
 	parsedToken, err := tu.parseToken(token)

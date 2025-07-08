@@ -10,6 +10,9 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// traceIp - это функция для запуска трассировки ip адреса
+//
+// возвращает ошибку, если remoteAddr некорректен и если не удаётся разобрать port
 func traceIp(token co.TokenData, remoteAddr string, ipTracer co.IIpRepository) error {
 	ip, portRaw, err := net.SplitHostPort(remoteAddr)
 	if err != nil {
@@ -22,6 +25,7 @@ func traceIp(token co.TokenData, remoteAddr string, ipTracer co.IIpRepository) e
 		if portRaw != "" {
 			return co.ErrInternalServerError
 		}
+		port = 0
 	}
 	go func() {
 		ipTracer.TraceIp(co.DataIP{
@@ -34,15 +38,14 @@ func traceIp(token co.TokenData, remoteAddr string, ipTracer co.IIpRepository) e
 	return nil
 }
 
+// parseBodyWithId - парсит тело запроса и извлекает токен и UID
+//
+// Возвращает ошибку, если не удаётся пропарсить токен и тело
 func parseBodyWithId(request *http.Request) (co.Token, co.UUID, error) {
 	var rawToken UserToken
 	//Чтение тела запроса
 	body, err := io.ReadAll(request.Body)
 	defer request.Body.Close()
-	//Проверка метода, должен быть POST
-	if request.Method != http.MethodPost {
-		return co.Token{}, co.UUID{}, co.ErrInvalidMethod
-	}
 	if err != nil {
 		return co.Token{}, co.UUID{}, co.ErrInternalServerError
 	}
@@ -63,15 +66,12 @@ func parseBodyWithId(request *http.Request) (co.Token, co.UUID, error) {
 	return token, uid, nil
 }
 
+// parseBody - парсит тело запроса и получает токен
 func parseBody(request *http.Request) (co.Token, error) {
 	var rawToken UserToken
 	//Чтение тела запроса
 	body, err := io.ReadAll(request.Body)
 	defer request.Body.Close()
-	//Проверка метода, должен быть POST
-	if request.Method != http.MethodPost {
-		return co.Token{}, co.ErrInvalidMethod
-	}
 	if err != nil {
 		return co.Token{}, co.ErrInternalServerError
 	}

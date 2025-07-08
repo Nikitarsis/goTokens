@@ -8,12 +8,14 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// TokensPairGetter - структура для получения пары токенов
 type TokensPairGetter struct {
 	getPairTokens       func(co.UUID) (map[string]co.TokenData, error)
 	userAgentRepository co.IUserAgentRepository
 	ipRepository        co.IIpRepository
 }
 
+// NewTokensPairGetter - создает новый экземпляр TokensPairGetter
 func NewTokensPairGetter(
 	getPairTokens func(co.UUID) (map[string]co.TokenData, error),
 	userAgentRepository co.IUserAgentRepository,
@@ -26,6 +28,7 @@ func NewTokensPairGetter(
 	}
 }
 
+// parseRequestGet - парсит GET-запрос и извлекает UID из строки параметров
 func (tg TokensPairGetter) parseRequestGet(request *http.Request) (co.UUID, error) {
 	userIdStr := request.URL.Query().Get("uid")
 	if userIdStr == "" {
@@ -38,6 +41,7 @@ func (tg TokensPairGetter) parseRequestGet(request *http.Request) (co.UUID, erro
 	return userId, nil
 }
 
+// parseRequestPost - парсит POST-запрос и извлекает UID из тела запроса
 func (tg TokensPairGetter) parseRequestPost(request *http.Request) (co.UUID, error) {
 	var userId UserId
 	var body []byte
@@ -56,10 +60,12 @@ func (tg TokensPairGetter) parseRequestPost(request *http.Request) (co.UUID, err
 	return ret, nil
 }
 
+// GetTokensPair - получает пару токенов
 func (tg TokensPairGetter) GetTokensPair(request *http.Request) co.Response {
 	method := request.Method
 	var userId co.UUID
 	var err error
+	// Разбор метода
 	switch method {
 	case http.MethodGet:
 		userId, err = tg.parseRequestGet(request)
@@ -74,6 +80,7 @@ func (tg TokensPairGetter) GetTokensPair(request *http.Request) co.Response {
 	default:
 		return co.ParseError(co.ErrInvalidMethod)
 	}
+	// Получение пары токенов
 	result, err := tg.getPairTokens(userId)
 	if err != nil {
 		return co.ParseError(co.ErrInternalServerError)
@@ -87,10 +94,12 @@ func (tg TokensPairGetter) GetTokensPair(request *http.Request) co.Response {
 	if err != nil {
 		return co.ParseError(co.ErrInternalServerError)
 	}
+	// Сохранение userAgent
 	go tg.userAgentRepository.SaveUserAgent(
 		refresh.KeyId,
 		request.UserAgent(),
 	)
+	// Трассировка IP
 	errIp := traceIp(refresh, request.RemoteAddr, tg.ipRepository)
 	if errIp != nil {
 		return co.ParseError(errIp)
@@ -101,6 +110,11 @@ func (tg TokensPairGetter) GetTokensPair(request *http.Request) co.Response {
 	}
 }
 
+// GetHandler - возвращает обработчик для получения пары токенов
+//
+// HTTP-методы - GET, POST
+//
+// Возвращает ошибку, если токен невалиден или возникла ошибка при обработке тела или токена
 func (tg TokensPairGetter) GetHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		response := tg.GetTokensPair(r)

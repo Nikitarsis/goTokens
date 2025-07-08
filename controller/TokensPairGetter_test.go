@@ -10,6 +10,7 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// Случайный токен
 func getRandomTokenData() co.TokenData {
 	return co.TokenData{
 		Token:   co.Token{Value: "just.random.token"},
@@ -20,6 +21,7 @@ func getRandomTokenData() co.TokenData {
 	}
 }
 
+// Проверка результата выполнения внедрённых функций
 func checkMap(
 	translator func(int, string) string,
 	kid co.UUID,
@@ -45,6 +47,7 @@ func checkMap(
 	return "Ok", true
 }
 
+// TestRequestGet - тест для GET-запроса
 func TestRequestGet(t *testing.T) {
 	uid := co.GetTestUUID()
 	reader := strings.NewReader("nothing")
@@ -74,6 +77,7 @@ func TestRequestGet(t *testing.T) {
 	}
 }
 
+// TestRequestPost - тест для POST-запроса
 func TestRequestPost(t *testing.T) {
 	uid := co.GetTestUUID()
 	body := fmt.Sprintf("{\"uid\":\"%s\"}", uid.ToString())
@@ -104,6 +108,7 @@ func TestRequestPost(t *testing.T) {
 	}
 }
 
+// TestGetTokensPair - тест для получения пары токенов
 func TestGetTokensPair(t *testing.T) {
 	uid := co.GetTestUUID()
 	reader := strings.NewReader("nothing")
@@ -138,8 +143,3 @@ func TestGetTokensPair(t *testing.T) {
 	}
 }
 
-// func TestMulti(t *testing.T) {
-// 	for i := 0; i < 500; i++ {
-// 		TestGetTokensPair(t)
-// 	}
-// }

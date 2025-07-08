@@ -10,6 +10,7 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// TestGetTokenId - тест для функции GetTokenId	
 func TestGetTokenId(t *testing.T) {
 	// Тестовое окружение
 	userId := co.GetTestUUID()

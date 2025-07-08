@@ -40,6 +40,10 @@ func (tr TokensRefresher) RefreshTokens(request *http.Request) (co.Response) {
 	if err != nil {
 		return co.ParseError(err)
 	}
+	//Проверка метода, должен быть POST
+	if request.Method != http.MethodPost {
+		return co.ParseError(co.ErrInvalidMethod)
+	}
 	// Парсинг токена
 	// Токен должен возвращать ошибку при !Valid
 	parsedToken, err := tr.parseToken(token)
@@ -88,6 +92,11 @@ func (tr TokensRefresher) RefreshTokens(request *http.Request) (co.Response) {
 	}
 }
 
+// GetHandler - возвращает обработчик для обновления токенов
+//
+// HTTP-метод - POST
+//
+// Возвращает ошибку, если прислан невалидный токен, access токен, и если сменился User-Agent(в таком случае инвалидизируется и пара токенов)
 func (tr TokensRefresher) GetHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		response := tr.RefreshTokens(r)

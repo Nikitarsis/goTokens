@@ -10,6 +10,7 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// TestTokensRefresh - тест для обновления токенов
 func TestTokensRefresh(t *testing.T) {
 	// Тестовое окружение
 	userId := co.GetTestUUID()

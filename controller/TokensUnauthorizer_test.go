@@ -10,6 +10,7 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// TestUnauthorizeTokens - тест для аннулирования токенов
 func TestUnauthorizeTokens(t *testing.T){
 		// Тестовое окружение
 	userId := co.GetTestUUID()

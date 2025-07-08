@@ -7,17 +7,24 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// TokensIdGetter - структура для получения user Id из токена
 type TokensIdGetter struct {
 	parseToken func(co.Token) (co.TokenData, error)
 }
 
+// NewTokensIdGetter - создает новый экземпляр TokensIdGetter
 func NewTokensIdGetter(parseToken func(co.Token) (co.TokenData, error)) *TokensIdGetter {
 	return &TokensIdGetter{
 		parseToken: parseToken,
 	}
 }
 
+// GetTokenId - получает user Id из токена
 func (tid *TokensIdGetter) GetTokenId(request *http.Request) co.Response {
+	//Проверка метода, должен быть POST
+	if request.Method != http.MethodPost {
+		return co.ParseError(co.ErrInvalidMethod)
+	}
 	token, err := parseBody(request)
 	if err != nil {
 		return co.ParseError(err)
@@ -39,6 +46,11 @@ func (tid *TokensIdGetter) GetTokenId(request *http.Request) co.Response {
 	}
 }
 
+// GetHandler - возвращает обработчик для получения user Id
+//
+// HTTP-метод - POST
+//
+// Возвращает ошибку, если токен невалиден или возникла ошибка при обработке тела или токена
 func (tid TokensIdGetter) GetHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		response := tid.GetTokenId(r)

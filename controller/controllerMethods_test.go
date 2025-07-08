@@ -10,6 +10,7 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// TestTraceIP - тест для функции traceIp
 func TestTraceIP(t *testing.T) {
 	testRepo, retMap := getTestIpRepository()
 	testTokenData := co.GetTestTokenData(co.AccessToken)
@@ -39,6 +40,7 @@ func TestTraceIP(t *testing.T) {
 	}
 }
 
+// TestParseBodyWithId - тест для функции parseBodyWithId
 func TestParseBodyWithId(t *testing.T) {
 	body := UserToken{
 		UID: co.GetTestUUID().ToString(),
@@ -65,6 +67,7 @@ func TestParseBodyWithId(t *testing.T) {
 	}
 }
 
+// TestParseBody - тест для функции parseBody
 func TestParseBody(t *testing.T) {
 	body := UserToken{
 		UID: co.GetTestUUID().ToString(),
