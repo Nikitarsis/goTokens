@@ -14,5 +14,5 @@ func CreateInMemoryIPRepository() co.IIpRepository {
 }
 
 func (r *IpRepositoryInMemory) TraceIp(data co.DataIP) {
-	fmt.Printf("KeyId: %s, IP: %s\n", data.KeyId, data.IP.String())
+	fmt.Printf("KeyId: %s, UserId: %s, FromPort: %d, IP: %s\n", data.KeyId.ToString(), data.UserId.ToString(), data.Port, data.IP.String())
 }
