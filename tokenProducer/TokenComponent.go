@@ -4,6 +4,11 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+type ITokenComponent interface{
+	CreateTokens(uid co.UUID) (map[string]co.TokenData, error)
+	ParseToken(token co.Token) (co.TokenData, error)
+} 
+
 // TokenComponent - компонент для работы с данным модулем
 type TokenComponent struct {
 	producer          *tokenProducer
@@ -13,7 +18,7 @@ type TokenComponent struct {
 }
 
 // NewTokenComponentDefault создает новый экземпляр TokenComponent с конфигурацией
-func NewTokenComponentDefault(keyRepository co.IKeyKeepingRepository, config ITokenComponentConfig) *TokenComponent {
+func NewTokenComponentDefault(keyRepository co.IKeyKeepingRepository, config ITokenComponentConfig) ITokenComponent {
 	componentSupplier := newSimpleComponentSupplier(config.GetKeyChannelSize(), config.GetIdChannelSize())
 	idSupply := componentSupplier.NewId
 	idFactory := keyRepository.GetKey
