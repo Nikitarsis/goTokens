@@ -9,7 +9,7 @@ import (
 type IpRepositoryInMemory struct {
 }
 
-func NewIpRepositoryInMemory() co.IIpRepository {
+func CreateInMemoryIPRepository() co.IIpRepository {
 	return &IpRepositoryInMemory{}
 }
 
