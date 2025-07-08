@@ -1,0 +1,242 @@
+openapi: '3.0.3'
+info:
+  title: API Title
+  version: '1.0'
+servers:
+  - url: https://127.0.0.1:10000
+
+components:
+  schemas:
+    user_id:
+      type: object
+      description: Уникальный идентификатор(UUID) пользователя в формате base64
+      properties:
+        uid:
+          type: string
+          description: Уникальный идентификатор(UUID) пользователя в формате base64
+          example: ZQPQs7Lr+S+Jyl2EHMzYEg
+          format: base64
+    user_token:
+      type: object
+      description: JWT токен пользователя с идентификатором(UUID) в формате base64
+      properties:
+        uid: 
+          $ref: "#/components/schemas/user_id/properties/uid"
+        token:
+          type: string
+          description: JWT токен
+          format: jwt
+          example: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NTIwMDQyMTEsImlzcyI6InRlc3QtaXNzdWVyIiwianRpIjoiMDE2b1AxTnlUZTJCc2Q2OWRsU2lRQSIsImtpZCI6Iit4bCs5ZmZ6UUIrd3l4UEwzcndkdnciLCJzdWIiOiJXZHFWckVRTEhkaDB5N2tmT05Ua0lBIiwidHlwZSI6ImFjY2VzcyJ9.2_dQZbwfp8kAsLr1PHZ515Ne-_nMu4XmNPB0OjdYKeXwpX71hj6sMyq8hYL6aQVKhskGIsKDYLk8QKNfzfpTZA
+    tokens_pair:
+      type: object
+      description: Пара токенов доступа(access) и обновления(refresh)
+      properties:
+        access:
+          $ref: "#/components/schemas/user_token/properties/token"
+        refresh:
+          $ref: "#/components/schemas/user_token/properties/token"
+paths:
+  /test/:
+    description: Тестовая группа, которая работает исключительно в debug режиме
+    summary: Тестовые эндпоинты
+  /test/id:
+    get:
+      summary: Получение случайного user_id
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/user_id/properties/uid"
+  /test/key:
+    get:
+      summary: Получение случайного ключа
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Случайный ключ
+                example: dZ7vgoo9D59M8hsJRMcRU5xWqVnLVuQWB3Bssp+GqbXEr1Sb7JTCRbjnIOuyq1BAJ08VtxjTyJEG3rH4m8T2XA==
+                format: base64
+  /test/info:
+    get:
+      summary: Получение информации о методах отладки
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Текст с информацией о методах отладки
+  /test/check:
+    get:
+      summary: Проверка работоспособности сервера
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Просто бессодержательный текст
+  /token/new:
+    description: Создание новой пары токенов
+    post:
+      requestBody:
+        description: Id пользователя
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user_id"
+      summary: Создание новой пары токенов
+      description: Предпочтительный метод получения токенов, так как он позволяет указать uid в теле запроса.
+      responses:
+        '200':
+          description: Успешное получение токенов
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokens_pair"
+        '400':
+          description: Неправильный запрос
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
+    get:
+      summary: Получение информации о токенах
+      deprecated: true
+      description: Метод GET валиден и будет поддерживаться в будущем, но он не желателен, поскольку требует указание uid в параметрах запроса
+      responses:
+        '200':
+          description: Успешное получение токенов
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokens_pair"
+        '400':
+          description: Неправильный запрос
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
+  /token/refresh:
+    description: Метод, позволяющий обновить токены
+    post:
+      summary: Обновление токенов
+      requestBody:
+        description: Параметры для обновления токенов
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Параметры для обновления токенов, требующие refresh токена, а не access
+              $ref: "#/components/schemas/user_token"
+      responses:
+        '200':
+          description: Успешное обновление токенов, старые токены инвалидизируются
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokens_pair"
+        '400':
+          description: Неправильный запрос
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
+        '403':
+          description: Доступ запрещен, поскольку User-Agent изменён. Токены инвалидизируются
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
+  /id:
+    description: Получение идентификатора пользователя
+    post:
+      summary: Получение идентификатора пользователя
+      requestBody:
+        description: Параметры для получения идентификатора пользователя, требующие access токена
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user_id"
+      responses:
+        '200':
+          description: Успешное получение идентификатора пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user_id/properties/uid"
+        '400':
+          description: Неправильный запрос
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
+  /unauthorize:
+    post:
+      summary: Инвалидация токенов
+      description: Метод, позволяющий инвалидировать токены
+      responses:
+        '200':
+          description: Успешная инвалидизация токенов
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание результата
+        '400':
+          description: Неправильный запрос
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Описание ошибки
