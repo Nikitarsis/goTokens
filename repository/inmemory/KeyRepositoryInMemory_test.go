@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// TestInMemoryKeyRepositorySave проверяет сохранение ключа в репозитории.
 func TestInMemoryKeyRepositorySave(t *testing.T) {
 	repo := CreateInMemoryKeyRepository()
 	key := co.CreateTestKey()
@@ -21,6 +22,7 @@ func TestInMemoryKeyRepositorySave(t *testing.T) {
 	}
 }
 
+// TestInMemoryKeyRepositoryLoad проверяет загрузку ключа из репозитория.
 func TestInMemoryKeyRepositoryLoad(t *testing.T) {
 	repo := CreateInMemoryKeyRepository()
 	key := co.CreateTestKey()
@@ -37,6 +39,7 @@ func TestInMemoryKeyRepositoryLoad(t *testing.T) {
 	}
 }
 
+// TestInMemoryKeyRepositoryDrop проверяет удаление ключа из репозитория.
 func TestInMemoryKeyRepositoryDrop(t *testing.T) {
 	repo := CreateInMemoryKeyRepository()
 	key := co.CreateTestKey()
