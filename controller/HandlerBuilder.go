@@ -4,18 +4,18 @@ import "net/http"
 
 type HttpServerBuilder struct {
 	handlerMap  map[string]IHandler
-	serverPort  string
+	serverAddr  string
 }
 
 func InitHttpServerBuilder() *HttpServerBuilder {
 	return &HttpServerBuilder{
 		handlerMap: make(map[string]IHandler),
-		serverPort: ":8080",
+		serverAddr: ":8080",
 	}
 }
 
-func (hs *HttpServerBuilder) GetHandler(path string) *HttpServerBuilder {
-	hs.serverPort = path
+func (hs *HttpServerBuilder) SetServerAddr(path string) *HttpServerBuilder {
+	hs.serverAddr = path
 	return hs
 }
 
@@ -30,7 +30,7 @@ func (hs *HttpServerBuilder) Build() http.Server {
 		mux.Handle(path, handler.GetHandler())
 	}
 	return http.Server{
-		Addr:    hs.serverPort,
+		Addr:    hs.serverAddr,
 		Handler: mux,
 	}
 }
