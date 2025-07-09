@@ -1,0 +1,1 @@
+INSERT INTO public.keys (kid, key) VALUES ($1, $2);

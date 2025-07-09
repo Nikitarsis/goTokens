@@ -1,0 +1,1 @@
+INSERT INTO public.user_agents (kid, user_agent) VALUES ($1, $2);

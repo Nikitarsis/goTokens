@@ -1,0 +1,1 @@
+SELECT ip, port FROM public.token_ips WHERE kid = $1;

@@ -1,0 +1,1 @@
+DELETE FROM public.keys WHERE kid = $1;

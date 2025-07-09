@@ -1,0 +1,1 @@
+SELECT user_agent FROM public.user_agents WHERE kid = $1;
