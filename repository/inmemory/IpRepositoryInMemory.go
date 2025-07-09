@@ -10,7 +10,7 @@ import (
 
 // In-Memory репозиторий IP, отправляющий данные в консоль.
 //
-// Да, это не репозиторий на самом деле, но это простая реализация для тестирования.
+// Это простая реализация для тестирования, она НЕ ДОЛЖНА использоваться в реальном проекте.
 type IpRepositoryInMemory struct {
 	savePorts bool
 	innerMap  *co.SafeMap[co.UUID, *co.SafeSet[string]]
@@ -26,7 +26,7 @@ func CreateInMemoryIPRepository(savePorts bool) inter.IIpRepository {
 	}
 }
 
-func (ir *IpRepositoryInMemory)	SaveIp(ip co.DataIP) error {
+func (ir *IpRepositoryInMemory) SaveIp(ip co.DataIP) error {
 	ir.mutex.Lock()
 	defer ir.mutex.Unlock()
 
@@ -34,7 +34,7 @@ func (ir *IpRepositoryInMemory)	SaveIp(ip co.DataIP) error {
 	if !ok {
 		data = co.CreateSafeSet[string]()
 	}
-	if (ir.savePorts) {
+	if ir.savePorts {
 		data.Store(fmt.Sprintf("%s:%d", ip.IP.String(), ip.Port))
 	}
 	data.Store(ip.IP.String())
@@ -42,7 +42,7 @@ func (ir *IpRepositoryInMemory)	SaveIp(ip co.DataIP) error {
 	return nil
 }
 
-func (ir *IpRepositoryInMemory)	CheckIp(ip co.DataIP) bool {
+func (ir *IpRepositoryInMemory) CheckIp(ip co.DataIP) bool {
 	ir.mutex.Lock()
 	defer ir.mutex.Unlock()
 

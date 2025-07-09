@@ -9,8 +9,8 @@ type UserAgentRepositoryInMemory struct {
 	userAgents *co.SafeMap[co.UUID, co.UserAgentData]
 }
 
-// CreateInMemoryUserRepository создает новый экземпляр UserAgentRepositoryInMemory.
-func CreateInMemoryUserRepository() co.IUserAgentRepository {
+// CreateInMemoryUserAgentRepository создает новый экземпляр UserAgentRepositoryInMemory.
+func CreateInMemoryUserAgentRepository() co.IUserAgentRepository {
 	safeMap := co.CreateSafeMap[co.UUID, co.UserAgentData]()
 	return &UserAgentRepositoryInMemory{
 		userAgents: safeMap,
