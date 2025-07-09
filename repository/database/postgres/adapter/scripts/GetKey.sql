@@ -1,0 +1,1 @@
+SELECT key FROM public.keys WHERE kid = $1;
