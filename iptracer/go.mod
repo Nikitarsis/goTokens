@@ -1,4 +1,4 @@
-module github.com/Nikitarsis/goTokens/ip_tracer
+module github.com/Nikitarsis/goTokens/iptracer
 
 go 1.22.2
 
