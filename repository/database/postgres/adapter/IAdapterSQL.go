@@ -1,4 +1,4 @@
-package postgres
+package adapter
 
 import (
 	co "github.com/Nikitarsis/goTokens/common"
