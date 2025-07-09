@@ -12,14 +12,14 @@ import (
 type TokensPairGetter struct {
 	getPairTokens       func(co.UUID) (map[string]co.TokenData, error)
 	userAgentRepository co.IUserAgentRepository
-	ipRepository        co.IIpRepository
+	ipRepository        co.IIpTracer
 }
 
 // NewTokensPairGetter - создает новый экземпляр TokensPairGetter
 func NewTokensPairGetter(
 	getPairTokens func(co.UUID) (map[string]co.TokenData, error),
 	userAgentRepository co.IUserAgentRepository,
-	ipRepository co.IIpRepository,
+	ipRepository co.IIpTracer,
 ) *TokensPairGetter {
 	return &TokensPairGetter{
 		getPairTokens:       getPairTokens,
@@ -97,7 +97,7 @@ func (tg TokensPairGetter) GetTokensPair(request *http.Request) co.Response {
 	// Сохранение userAgent
 	go tg.userAgentRepository.SaveUserAgent(
 		refresh.KeyId,
-		request.UserAgent(),
+		co.ParseUserAgentFromString(request.UserAgent()),
 	)
 	// Трассировка IP
 	errIp := traceIp(refresh, request.RemoteAddr, tg.ipRepository)
@@ -112,7 +112,7 @@ func (tg TokensPairGetter) GetTokensPair(request *http.Request) co.Response {
 
 // GetHandler - возвращает обработчик для получения пары токенов
 //
-// HTTP-методы - GET, POST
+// # HTTP-методы - GET, POST
 //
 // Возвращает ошибку, если токен невалиден или возникла ошибка при обработке тела или токена
 func (tg TokensPairGetter) GetHandler() http.Handler {

@@ -13,7 +13,7 @@ import (
 // traceIp - это функция для запуска трассировки ip адреса
 //
 // возвращает ошибку, если remoteAddr некорректен и если не удаётся разобрать port
-func traceIp(token co.TokenData, remoteAddr string, ipTracer co.IIpRepository) error {
+func traceIp(token co.TokenData, remoteAddr string, ipTracer co.IIpTracer) error {
 	ip, portRaw, err := net.SplitHostPort(remoteAddr)
 	if err != nil {
 		if remoteAddr != "" {

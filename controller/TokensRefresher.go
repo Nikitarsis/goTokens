@@ -12,7 +12,7 @@ type TokensRefresher struct {
 	getPairTokens func(co.UUID) (map[string]co.TokenData, error)
 	parseToken    func(co.Token) (co.TokenData, error)
 	userAgent     co.IUserAgentRepository
-	ipTracer      co.IIpRepository
+	ipTracer      co.IIpTracer
 	dropKey       func(co.UUID) bool
 }
 
@@ -21,7 +21,7 @@ func NewTokensRefresher(
 	getPairTokens func(co.UUID) (map[string]co.TokenData, error),
 	parseToken func(co.Token) (co.TokenData, error),
 	userAgent co.IUserAgentRepository,
-	ipTracer co.IIpRepository,
+	ipTracer co.IIpTracer,
 	dropKey func(co.UUID) bool,
 	) *TokensRefresher {
 	return &TokensRefresher{
@@ -66,7 +66,7 @@ func (tr TokensRefresher) RefreshTokens(request *http.Request) (co.Response) {
 		return co.ParseError(co.ErrStealedToken)
 	}
 	// Если User-Agent не соответствует указанному при получении токена, ключи удаляются
-	if !tr.userAgent.CheckUserAgent(parsedToken.KeyId, request.UserAgent()) {
+	if !tr.userAgent.CheckUserAgent(parsedToken.KeyId, co.ParseUserAgentFromString(request.UserAgent())) {
 		go tr.dropKey(parsedToken.KeyId)
 		return co.ParseError(co.ErrInvalidUserAgent)
 	}

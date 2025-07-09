@@ -13,8 +13,8 @@ type testUserAgentRepository struct {
 // SaveUserAgent сохраняет userAgent для данного kid:
 // userAgent -> userAgent(SaveUserAgent);
 // kid -> kid(SaveUserAgent);
-func (r *testUserAgentRepository) SaveUserAgent(kid co.UUID, userAgent string) error {
-	r.ret.Store("userAgent(SaveUserAgent)", userAgent)
+func (r *testUserAgentRepository) SaveUserAgent(kid co.UUID, userAgent co.UserAgentData) error {
+	r.ret.Store("userAgent(SaveUserAgent)", userAgent.ToString())
 	r.ret.Store("kid(SaveUserAgent)", kid.ToString())
 	return nil
 }
@@ -22,8 +22,8 @@ func (r *testUserAgentRepository) SaveUserAgent(kid co.UUID, userAgent string) e
 // CheckUserAgent проверяет userAgent для данного kid:
 // userAgent -> userAgent(CheckUserAgent);
 // kid -> kid(CheckUserAgent);
-func (r *testUserAgentRepository) CheckUserAgent(kid co.UUID, userAgent string) bool {
-	r.ret.Store("userAgent(CheckUserAgent)", userAgent)
+func (r *testUserAgentRepository) CheckUserAgent(kid co.UUID, userAgent co.UserAgentData) bool {
+	r.ret.Store("userAgent(CheckUserAgent)", userAgent.ToString())
 	r.ret.Store("kid(CheckUserAgent)", kid.ToString())
 	return true
 }
@@ -59,8 +59,8 @@ func (r *testIpRepository) TraceIp(data co.DataIP) {
 	r.ret.Store("uid(TraceIp)", data.UserId.ToString())
 }
 
-// Создание тестового IIpRepository
-func getTestIpRepository() (co.IIpRepository, *co.SafeMap[string, string]) {
+// Создание тестового IIpTracer
+func getTestIpRepository() (co.IIpTracer, *co.SafeMap[string, string]) {
 	ret := co.CreateSafeMap[string, string]()
 	repo := testIpRepository{ret: ret}
 	return &repo, ret
