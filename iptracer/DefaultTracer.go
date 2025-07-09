@@ -11,21 +11,21 @@ import (
 )
 
 type DefaultTracer struct {
-	url    string
-	buffer []string
-	wg     sync.WaitGroup
-	delay  time.Duration
-	saveIp func(co.DataIP) error
+	url     string
+	buffer  []string
+	wg      sync.WaitGroup
+	delay   time.Duration
+	saveIp  func(co.DataIP) error
 	checkIp func(co.DataIP) bool
 }
 
-func CreateDefaultTracer(config ITracerConfig, saveIp func(co.DataIP) error, checkIp func(co.DataIP) bool) ITracerIp {
+func CreateDefaultTracer(config ITracerConfig, saveIp func(co.DataIP) error, checkIp func(co.DataIP) bool) co.IIpTracer {
 	ret := &DefaultTracer{
-		url:    config.GetWebhookURL(),
-		buffer: make([]string, config.GetBufferSize()),
-		wg:     sync.WaitGroup{},
-		delay:  config.GetDelay(),
-		saveIp: saveIp,
+		url:     config.GetWebhookURL(),
+		buffer:  make([]string, config.GetBufferSize()),
+		wg:      sync.WaitGroup{},
+		delay:   config.GetDelay(),
+		saveIp:  saveIp,
 		checkIp: checkIp,
 	}
 	if config.ShouldSendWebhookMessage() {
@@ -71,13 +71,12 @@ func (dt *DefaultTracer) parseIpData(ip co.DataIP) string {
 	return ret
 }
 
-func (dt *DefaultTracer) TraceIP(ip co.DataIP) error {
+func (dt *DefaultTracer) TraceIp(ip co.DataIP) {
 	check := dt.checkIp(ip)
 	if check {
-		return nil
+		return
 	}
 	dt.saveIp(ip)
 	dt.wg.Wait()
 	dt.buffer = append(dt.buffer, dt.parseIpData(ip))
-	return nil
 }
