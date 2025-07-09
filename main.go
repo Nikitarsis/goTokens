@@ -5,26 +5,32 @@ import (
 
 	co "github.com/Nikitarsis/goTokens/common"
 	con "github.com/Nikitarsis/goTokens/controller"
+	it "github.com/Nikitarsis/goTokens/iptracer"
 	repo "github.com/Nikitarsis/goTokens/repository"
+	ri "github.com/Nikitarsis/goTokens/repository/interfaces"
 	tok "github.com/Nikitarsis/goTokens/tokenProducer"
 )
 
-var keyRepository repo.IKeyRepository
+var keyRepository ri.IKeyRepository
 var userRepository co.IUserAgentRepository
-var ipRepository co.IIpRepository
-var config co.IDefaultConfig
+var ipRepository ri.IIpRepository
+var config IConfig
 var tokenComponent tok.ITokenComponent
+var ipTracer co.IIpTracer
 
 func main() {
 	// Создание репозиториев долгосрочного хранения
+	config = NewTestConfig()
 	fmt.Println("Create repositories")
-	keyRepository = repo.CreateKeyRepository()
-	userRepository = repo.CreateUserRepository()
-	ipRepository = repo.CreateIPRepository()
+	keyRepository = repo.CreateKeyRepository(config)
+	userRepository = repo.CreateUserRepository(config)
+	ipRepository = repo.CreateIPRepository(config)
+	// Создание компонента трассировки IP
+	fmt.Println("Create IP tracer")
+	ipTracer = it.CreateDefaultTracer(config, ipRepository.SaveIp, ipRepository.CheckIp)
 	// Создание компонента обработки токенов
 	fmt.Println("Create token component")
-	tokenComponent = tok.NewTokenComponentDefault(keyRepository, NewTestConfig())
-	config = NewTestConfig()
+	tokenComponent = tok.NewTokenComponentDefault(keyRepository, config)
 	// Создание обработчика HTTP
 	fmt.Println("Create HTTP handler")
 	handlerBuilder := con.InitHttpServerBuilder()
@@ -34,7 +40,7 @@ func main() {
 		con.NewTokensPairGetter(
 			tokenComponent.CreateTokens,
 			userRepository,
-			ipRepository,
+			ipTracer,
 		),
 	)
 	// Обновляет существующую пару токенов, если refresh токен верный
@@ -44,7 +50,7 @@ func main() {
 			tokenComponent.CreateTokens,
 			tokenComponent.ParseToken,
 			userRepository,
-			ipRepository,
+			ipTracer,
 			keyRepository.DropKey,
 		),
 	)

@@ -8,6 +8,7 @@ import (
 	con "github.com/Nikitarsis/goTokens/controller"
 )
 
+// GetTestHandler возвращает обработчик для тестирования
 func GetTestHandler(isDebug bool) con.IHandler {
 	if isDebug {
 		return &DebugHandler{}
@@ -15,8 +16,10 @@ func GetTestHandler(isDebug bool) con.IHandler {
 	return &StubDebugHandler{}
 }
 
+// DebugHandler реализует обработчик для отладки
 type DebugHandler struct{}
 
+// greeting возвращает приветственное сообщение для отладки
 func (dh *DebugHandler) greeting(r *http.Request) string {
 	ret := fmt.Sprintf("Hiiii, %s from %s (*ﾟｰﾟ)ゞ\n", r.UserAgent(), r.RemoteAddr)
 	ret += "Debug mode is active\n"
@@ -24,6 +27,7 @@ func (dh *DebugHandler) greeting(r *http.Request) string {
 	return ret
 }
 
+// getInfo возвращает информацию для отладки
 func (dh *DebugHandler) getInfo(r *http.Request, isWrongPath bool) string {
 	ret := dh.greeting(r)
 	if isWrongPath {
@@ -38,6 +42,7 @@ func (dh *DebugHandler) getInfo(r *http.Request, isWrongPath bool) string {
 	return ret
 }
 
+// GetHandler возвращает обработчик для отладки
 func (dh *DebugHandler) GetHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
