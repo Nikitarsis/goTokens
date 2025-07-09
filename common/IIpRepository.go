@@ -1,7 +1,7 @@
 package common
 
-// IIpRepository - интерфейс для работы с репозиторием IP-адресов
-type IIpRepository interface {
+// IIpTracer - интерфейс для работы с репозиторием IP-адресов
+type IIpTracer interface {
 	// TraceIp - трассирует IP-адрес
 	TraceIp(data DataIP)
 }

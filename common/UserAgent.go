@@ -1,18 +1,18 @@
 package common
 
-// UserAgent - структура для хранения User-Agent
-type UserAgent struct {
+// UserAgentData - структура для хранения User-Agent
+type UserAgentData struct {
 	Data string
 }
 
 // ParseUserAgentFromString - парсит User-Agent из строки
-func ParseUserAgentFromString(data string) UserAgent {
-	return UserAgent{
+func ParseUserAgentFromString(data string) UserAgentData {
+	return UserAgentData{
 		Data: data,
 	}
 }
 
 // ToString - возвращает строковое представление User-Agent
-func (ua UserAgent) ToString() string {
+func (ua UserAgentData) ToString() string {
 	return ua.Data
 }
