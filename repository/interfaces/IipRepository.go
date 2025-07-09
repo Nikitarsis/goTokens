@@ -5,6 +5,6 @@ import (
 )
 
 type IIpRepository interface {
-	SaveIp(kid co.UUID, ip co.DataIP) error
-	CheckIp(kid co.UUID, ip co.DataIP) bool
+	SaveIp(ip co.DataIP) error
+	CheckIp(ip co.DataIP) bool
 }
