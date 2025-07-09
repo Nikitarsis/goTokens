@@ -4,6 +4,7 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// IAdapterSQL определяет интерфейс для работы с адаптером SQL
 type IAdapterSQL interface {
 	CreateTablesIFNotExists()
 	AddKey(kid co.UUID, key co.Key)

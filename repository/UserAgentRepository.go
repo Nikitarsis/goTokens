@@ -8,6 +8,7 @@ import (
 	in "github.com/Nikitarsis/goTokens/repository/interfaces"
 )
 
+// UserAgentRepository реализует интерфейс IUserAgentRepository
 type UserAgentRepository struct {
 	db       co.IUserAgentRepository
 	hotCacheToSave *co.SafeMap[co.UUID, co.UserAgentData]
@@ -15,6 +16,7 @@ type UserAgentRepository struct {
 	localMutex *sync.Mutex
 }
 
+// NewUserAgentRepository создает новый экземпляр UserAgentRepository
 func NewUserAgentRepository(config in.IRepositoryConfig) co.IUserAgentRepository {
 	db := pg.CreatePostgresUserAgentRepository(config)
 	hotCacheToSave := &co.SafeMap[co.UUID, co.UserAgentData]{}
@@ -27,6 +29,7 @@ func NewUserAgentRepository(config in.IRepositoryConfig) co.IUserAgentRepository
 	}
 }
 
+// getMutex возвращает мьютекс для заданного идентификатора User-Agent
 func (kr *UserAgentRepository) getMutex(kid co.UUID) *sync.Mutex {
 	// Загрузка мьютекса
 	mtx, ok := kr.mutexMap.Load(kid)
@@ -48,6 +51,7 @@ func (kr *UserAgentRepository) getMutex(kid co.UUID) *sync.Mutex {
 	return ret
 }
 
+// SaveUserAgent сохраняет User-Agent в репозитории
 func (kr *UserAgentRepository) SaveUserAgent(kid co.UUID, userAgent co.UserAgentData) error {
 	// Сохраняем ключ в горячий кэш сохранения и назначаем удаление
 	kr.hotCacheToSave.Store(kid, userAgent)
@@ -60,6 +64,7 @@ func (kr *UserAgentRepository) SaveUserAgent(kid co.UUID, userAgent co.UserAgent
 	return kr.db.SaveUserAgent(kid, userAgent)
 }
 
+// CheckUserAgent проверяет, существует ли User-Agent в репозитории
 func (kr *UserAgentRepository) CheckUserAgent(kid co.UUID, userAgent co.UserAgentData) bool {
 	// Проверяем горячий кэш сохранения на наличие User-Agent
 	toSave, ok := kr.hotCacheToSave.Load(kid)

@@ -8,38 +8,41 @@ import (
 //go:embed scripts
 var sqlScripts embed.FS
 
-func CreateAdapterSQL(db *sql.DB) (IAdapterSQL, error) {
+// CreateAdapterSQL создает новый экземпляр адаптера SQL
+//
+// Парсит включённую директорию и загружает SQL-скрипты, если что-то не срабатывает, поднимает панику.
+func CreateAdapterSQL(db *sql.DB) IAdapterSQL {
 	CreateTablesQuery, err := sqlScripts.ReadFile("scripts/CreateTables.sql")
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	AddKeyQuery, err := sqlScripts.ReadFile("scripts/AddKey.sql")
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	GetKeyQuery, err := sqlScripts.ReadFile("scripts/GetKey.sql")
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	RemoveKeyQuery, err := sqlScripts.ReadFile("scripts/RemoveKey.sql")
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	AddUserAgentsQuery, err := sqlScripts.ReadFile("scripts/AddUserAgent.sql")
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	GetUserAgentsQuery, err := sqlScripts.ReadFile("scripts/GetUserAgent.sql")
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	AddIpQuery, err := sqlScripts.ReadFile("scripts/AddIP.sql")
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	CheckIpQuery, err := sqlScripts.ReadFile("scripts/CheckIP.sql")
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	return &adapterSQL{
@@ -57,5 +60,5 @@ func CreateAdapterSQL(db *sql.DB) (IAdapterSQL, error) {
 		AddIpQuery:         string(AddIpQuery),
 		CheckIpQuery:       string(CheckIpQuery),
 		GetKeyQuery:        string(GetKeyQuery),
-	}, nil
+	}
 }

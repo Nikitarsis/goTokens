@@ -8,6 +8,9 @@ import (
 	in "github.com/Nikitarsis/goTokens/repository/interfaces"
 )
 
+// KeyRepository реализует интерфейс IKeyRepository
+//
+// Он содержит методы горячего хэширования, позволяющие быстро сохранять и проверять ключи.
 type KeyRepository struct {
 	db       in.IKeyRepository
 	hotCacheToSave *co.SafeMap[co.UUID, co.Key]
@@ -16,6 +19,7 @@ type KeyRepository struct {
 	localMutex *sync.Mutex
 }
 
+// NewKeyRepository создает новый экземпляр KeyRepository
 func NewKeyRepository(config in.IRepositoryConfig) in.IKeyRepository {
 	db := pg.CreatePostgresKeyRepository(config)
 	hotCacheToSave := &co.SafeMap[co.UUID, co.Key]{}
@@ -30,6 +34,7 @@ func NewKeyRepository(config in.IRepositoryConfig) in.IKeyRepository {
 	}
 }
 
+// getMutex возвращает мьютекс для заданного идентификатора ключа
 func (kr *KeyRepository) getMutex(kid co.UUID) *sync.Mutex {
 	// Загрузка мьютекса
 	mtx, ok := kr.mutexMap.Load(kid)
@@ -51,6 +56,7 @@ func (kr *KeyRepository) getMutex(kid co.UUID) *sync.Mutex {
 	return ret
 }
 
+// SaveKey сохраняет ключ в репозитории
 func (kr *KeyRepository) SaveKey(key co.Key) {
 	// Сохраняем ключ в горячий кэш сохранения и назначаем удаление
 	kr.hotCacheToSave.Store(key.GetKid(), key)
@@ -63,6 +69,7 @@ func (kr *KeyRepository) SaveKey(key co.Key) {
 	kr.db.SaveKey(key)
 }
 
+// GetKey возвращает ключ по заданному идентификатору
 func (kr *KeyRepository) GetKey(kid co.UUID) (co.Key, bool) {
 	// Проверяем горячий кэш сохранения на наличие ключа
 	toSave, ok := kr.hotCacheToSave.Load(kid)
@@ -84,6 +91,7 @@ func (kr *KeyRepository) GetKey(kid co.UUID) (co.Key, bool) {
 	return kr.db.GetKey(kid)
 }
 
+// DropKey удаляет ключ из репозитория
 func (kr *KeyRepository) DropKey(kid co.UUID) bool {
 	// Сохраняем ключ в горячий кэш сохранения и назначаем удаление
 	kr.hotCacheToRemove.Store(kid)

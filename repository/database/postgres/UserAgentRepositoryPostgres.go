@@ -19,10 +19,7 @@ func CreatePostgresUserAgentRepository(config inter.IPostgresConfig) co.IUserAge
 	if err != nil {
 		return nil
 	}
-	adapter, err := ad.CreateAdapterSQL(db)
-	if err != nil {
-		return nil
-	}
+	adapter := ad.CreateAdapterSQL(db)
 	return &UserAgentRepositoryPostgres{
 		adapter: adapter,
 	}

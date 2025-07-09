@@ -14,15 +14,13 @@ type KeyRepositoryPostgres struct {
 	adapter ad.IAdapterSQL
 }
 
+// CreatePostgresKeyRepository создает новый экземпляр KeyRepositoryPostgres
 func CreatePostgresKeyRepository(config inter.IPostgresConfig) inter.IKeyRepository {
 	db, err := sql.Open("postgres", config.GetConnectionString())
 	if err != nil {
 		return nil
 	}
-	adapter, err := ad.CreateAdapterSQL(db)
-	if err != nil {
-		return nil
-	}
+	adapter := ad.CreateAdapterSQL(db)
 	return &KeyRepositoryPostgres{
 		adapter: adapter,
 	}
