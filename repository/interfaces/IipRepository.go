@@ -1,4 +1,4 @@
-package repository
+package interfaces
 
 import (
 	co "github.com/Nikitarsis/goTokens/common"
