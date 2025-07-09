@@ -3,10 +3,11 @@ package repository
 import (
 	co "github.com/Nikitarsis/goTokens/common"
 	inmem "github.com/Nikitarsis/goTokens/repository/inmemory"
+	inter "github.com/Nikitarsis/goTokens/repository/interfaces"
 )
 
 // CreateKeyRepository создает новый экземпляр IKeyRepository.
-func CreateKeyRepository() IKeyRepository {
+func CreateKeyRepository() inter.IKeyRepository {
 	return inmem.CreateInMemoryKeyRepository()
 }
 
@@ -16,6 +17,6 @@ func CreateUserRepository() co.IUserAgentRepository {
 }
 
 // CreateIPRepository создает новый экземпляр IIpRepository.
-func CreateIPRepository() co.IIpRepository {
-	return inmem.CreateInMemoryIPRepository()
+func CreateIPRepository(config inter.IRepositoryConfig) inter.IIpRepository {
+	return inmem.CreateInMemoryIPRepository(config.TracePorts()	)
 }
