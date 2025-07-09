@@ -22,14 +22,15 @@ func CreateInMemoryIPRepository(savePorts bool) inter.IIpRepository {
 	return &IpRepositoryInMemory{
 		savePorts: savePorts,
 		innerMap:  co.CreateSafeMap[co.UUID, *co.SafeSet[string]](),
+		mutex:     sync.Mutex{},
 	}
 }
 
-func (ir *IpRepositoryInMemory)	SaveIp(kid co.UUID, ip co.DataIP) error {
+func (ir *IpRepositoryInMemory)	SaveIp(ip co.DataIP) error {
 	ir.mutex.Lock()
 	defer ir.mutex.Unlock()
 
-	data, ok := ir.innerMap.Load(kid)
+	data, ok := ir.innerMap.Load(ip.KeyId)
 	if !ok {
 		data = co.CreateSafeSet[string]()
 	}
@@ -37,15 +38,15 @@ func (ir *IpRepositoryInMemory)	SaveIp(kid co.UUID, ip co.DataIP) error {
 		data.Store(fmt.Sprintf("%s:%d", ip.IP.String(), ip.Port))
 	}
 	data.Store(ip.IP.String())
-	ir.innerMap.Store(kid, data)
+	ir.innerMap.Store(ip.KeyId, data)
 	return nil
 }
 
-func (ir *IpRepositoryInMemory)	CheckIp(kid co.UUID, ip co.DataIP) bool {
+func (ir *IpRepositoryInMemory)	CheckIp(ip co.DataIP) bool {
 	ir.mutex.Lock()
 	defer ir.mutex.Unlock()
 
-	storedIp, ok := ir.innerMap.Load(kid)
+	storedIp, ok := ir.innerMap.Load(ip.KeyId)
 	if !ok {
 		return false
 	}
