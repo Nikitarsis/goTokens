@@ -30,6 +30,10 @@ func (s *SafeMap[K, V]) Load(key K) (V, bool) {
 func (s *SafeMap[K, V]) Store(key K, value V) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
+	_, ok := s.innerMap[key]
+	if ok {
+		return
+	}
 	s.innerMap[key] = value
 }
 
