@@ -10,6 +10,7 @@ import (
 	co "github.com/Nikitarsis/goTokens/common"
 )
 
+// DefaultTracer реализует интерфейс IIpTracer
 type DefaultTracer struct {
 	url     string
 	buffer  []string
@@ -19,6 +20,7 @@ type DefaultTracer struct {
 	checkIp func(co.DataIP) bool
 }
 
+// CreateDefaultTracer создает новый экземпляр DefaultTracer
 func CreateDefaultTracer(config ITracerConfig, saveIp func(co.DataIP) error, checkIp func(co.DataIP) bool) co.IIpTracer {
 	ret := &DefaultTracer{
 		url:     config.GetWebhookURL(),
@@ -36,6 +38,7 @@ func CreateDefaultTracer(config ITracerConfig, saveIp func(co.DataIP) error, che
 	return ret
 }
 
+// sendMessage отправляет сообщение в вебхук
 func (dt *DefaultTracer) sendMessage() {
 	if len(dt.buffer) == 0 {
 		return
@@ -50,6 +53,7 @@ func (dt *DefaultTracer) sendMessage() {
 	dt.buffer = dt.buffer[:0]
 }
 
+// msgLoop отправляет сообщения в вебхук с заданной периодичностью
 func (dt *DefaultTracer) msgLoop() {
 	for {
 		dt.sendMessage()
@@ -57,6 +61,7 @@ func (dt *DefaultTracer) msgLoop() {
 	}
 }
 
+// logToStdLoop отправляет сообщения в стандартный вывод с заданной периодичностью
 func (dt *DefaultTracer) logToStdLoop() {
 	for {
 		fmt.Print(strings.Join(dt.buffer, "\n"))
@@ -64,6 +69,7 @@ func (dt *DefaultTracer) logToStdLoop() {
 	}
 }
 
+// parseIpData формирует строку JSON из данных IP
 func (dt *DefaultTracer) parseIpData(ip co.DataIP) string {
 	ret := fmt.Sprintf("{\"kid\"=\"%s\", ", ip.KeyId.ToString())
 	ret += fmt.Sprintf("\"uid\"=\"%s\", ", ip.UserId.ToString())
@@ -71,6 +77,7 @@ func (dt *DefaultTracer) parseIpData(ip co.DataIP) string {
 	return ret
 }
 
+// TraceIp отслеживает IP-адрес
 func (dt *DefaultTracer) TraceIp(ip co.DataIP) {
 	check := dt.checkIp(ip)
 	if check {
