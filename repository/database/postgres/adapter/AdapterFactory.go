@@ -44,6 +44,10 @@ func CreateAdapterSQL(db *sql.DB) IAdapterSQL {
 	if err != nil {
 		panic(err)
 	}
+	pingErr := db.Ping()
+	if pingErr != nil {
+		panic(pingErr)
+	}
 
 	return &adapterSQL{
 		Exec: func(query string, args ...interface{}) (sql.Result, error) {
