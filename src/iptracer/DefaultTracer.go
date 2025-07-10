@@ -24,7 +24,7 @@ type DefaultTracer struct {
 func CreateDefaultTracer(config ITracerConfig, saveIp func(co.DataIP) error, checkIp func(co.DataIP) bool) co.IIpTracer {
 	ret := &DefaultTracer{
 		url:     config.GetWebhookURL(),
-		buffer:  make([]string, config.GetBufferSize()),
+		buffer:  make([]string, 0),
 		wg:      sync.WaitGroup{},
 		delay:   config.GetDelay(),
 		saveIp:  saveIp,
@@ -69,6 +69,7 @@ func (dt *DefaultTracer) logToStdLoop() {
 			continue
 		}
 		fmt.Print(strings.Join(dt.buffer, "\n"))
+		fmt.Print("\n")
 		time.Sleep(dt.delay)
 	}
 }

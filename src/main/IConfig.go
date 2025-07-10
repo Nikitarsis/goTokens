@@ -37,12 +37,12 @@ func (tc TestConfig) GetDelay() time.Duration {
 
 // GetWebhookURL возвращает URL вебхука
 func (tc TestConfig) GetWebhookURL() string {
-	return "http://localhost:8080/webhook"
+	return "http://webhook:8000"
 }
 
 // ShouldSendWebhookMessage возвращает, нужно ли отправлять сообщение вебхука
 func (tc TestConfig) ShouldSendWebhookMessage() bool {
-	return false
+	return true
 }
 
 // GetConnectionString возвращает строку подключения
