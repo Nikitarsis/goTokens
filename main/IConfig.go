@@ -47,7 +47,7 @@ func (tc TestConfig) ShouldSendWebhookMessage() bool {
 
 // GetConnectionString возвращает строку подключения
 func (tc TestConfig) GetConnectionString() string {
-	return ""
+	return "user=postgres password=postgres dbname=appdb"
 }
 
 // GetKeyChannelSize возвращает размер канала ключей

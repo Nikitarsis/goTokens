@@ -1,4 +1,4 @@
-module github.com/Nikitarsis/goTokens
+module github.com/Nikitarsis/goTokens/main
 
 go 1.22.2
 
@@ -16,12 +16,12 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 )
 
-replace github.com/Nikitarsis/goTokens/common => ./common
+replace github.com/Nikitarsis/goTokens/common => ../common
 
-replace github.com/Nikitarsis/goTokens/repository => ./repository
+replace github.com/Nikitarsis/goTokens/repository => ../repository
 
-replace github.com/Nikitarsis/goTokens/tokenProducer => ./tokenProducer
+replace github.com/Nikitarsis/goTokens/tokenProducer => ../tokenProducer
 
-replace github.com/Nikitarsis/goTokens/controller => ./controller
+replace github.com/Nikitarsis/goTokens/controller => ../controller
 
-replace github.com/Nikitarsis/goTokens/iptracer => ./iptracer
+replace github.com/Nikitarsis/goTokens/iptracer => ../iptracer
