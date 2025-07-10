@@ -50,7 +50,7 @@ func (dt *DefaultTracer) sendMessage() {
 		fmt.Println("Error sending message:", err)
 		return
 	}
-	dt.buffer = dt.buffer[:0]
+	dt.buffer = []string{}
 }
 
 // msgLoop отправляет сообщения в вебхук с заданной периодичностью
@@ -64,6 +64,10 @@ func (dt *DefaultTracer) msgLoop() {
 // logToStdLoop отправляет сообщения в стандартный вывод с заданной периодичностью
 func (dt *DefaultTracer) logToStdLoop() {
 	for {
+		if len(dt.buffer) == 0 {
+			time.Sleep(dt.delay)
+			continue
+		}
 		fmt.Print(strings.Join(dt.buffer, "\n"))
 		time.Sleep(dt.delay)
 	}
