@@ -27,6 +27,20 @@ services:
       - app-network
     restart: always
 
+  webhook:
+    image: python:3-alpine3.22
+    working_dir: /webhook
+    volumes:
+      - ./webhook/:/webhook
+    command: python main.py
+    ports:
+      - "8000:8000"
+    expose:
+      - "8000"
+    networks:
+      - app-network
+    restart: always
+
   db:
     image: postgres:17.5-alpine3.22
     environment:
