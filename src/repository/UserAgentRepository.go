@@ -10,21 +10,21 @@ import (
 
 // UserAgentRepository реализует интерфейс IUserAgentRepository
 type UserAgentRepository struct {
-	db       co.IUserAgentRepository
+	db             co.IUserAgentRepository
 	hotCacheToSave *co.SafeMap[co.UUID, co.UserAgentData]
-	mutexMap *co.SafeMap[co.UUID, *sync.Mutex]
-	localMutex *sync.Mutex
+	mutexMap       *co.SafeMap[co.UUID, *sync.Mutex]
+	localMutex     *sync.Mutex
 }
 
 // NewUserAgentRepository создает новый экземпляр UserAgentRepository
 func NewUserAgentRepository(config in.IRepositoryConfig) co.IUserAgentRepository {
 	db := pg.CreatePostgresUserAgentRepository(config)
-	hotCacheToSave := &co.SafeMap[co.UUID, co.UserAgentData]{}
-	mutexMap := &co.SafeMap[co.UUID, *sync.Mutex]{}
+	hotCacheToSave := co.CreateSafeMap[co.UUID, co.UserAgentData]()
+	mutexMap := co.CreateSafeMap[co.UUID, *sync.Mutex]()
 	return &UserAgentRepository{
-		db:              db,
-		hotCacheToSave:  hotCacheToSave,
-		mutexMap:        mutexMap,
+		db:             db,
+		hotCacheToSave: hotCacheToSave,
+		mutexMap:       mutexMap,
 		localMutex:     &sync.Mutex{},
 	}
 }

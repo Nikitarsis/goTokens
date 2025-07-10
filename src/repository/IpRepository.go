@@ -20,10 +20,10 @@ type IpRepository struct {
 // NewIpRepository создает новый экземпляр IpRepository
 func NewIpRepository(config in.IRepositoryConfig) in.IIpRepository {
 	db := pg.NewIpRepositoryPostgres(config)
-	hotCacheToSave := &co.SafeMap[string, co.DataIP]{}
+	hotCacheToSave := co.CreateSafeMap[string, co.DataIP]()
 	return &IpRepository{
-		db:              db,
-		hotCacheToSave:  hotCacheToSave,
+		db:             db,
+		hotCacheToSave: hotCacheToSave,
 		tracePort:      config.TracePorts(),
 	}
 }

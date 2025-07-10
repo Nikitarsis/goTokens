@@ -22,9 +22,9 @@ type KeyRepository struct {
 // NewKeyRepository создает новый экземпляр KeyRepository
 func NewKeyRepository(config in.IRepositoryConfig) in.IKeyRepository {
 	db := pg.CreatePostgresKeyRepository(config)
-	hotCacheToSave := &co.SafeMap[co.UUID, co.Key]{}
-	hotCacheToRemove := &co.SafeSet[co.UUID]{}
-	mutexMap := &co.SafeMap[co.UUID, *sync.Mutex]{}
+	hotCacheToSave := co.CreateSafeMap[co.UUID, co.Key]()
+	hotCacheToRemove := co.CreateSafeSet[co.UUID]()
+	mutexMap := co.CreateSafeMap[co.UUID, *sync.Mutex]()
 	return &KeyRepository{
 		db:              db,
 		hotCacheToSave:  hotCacheToSave,
